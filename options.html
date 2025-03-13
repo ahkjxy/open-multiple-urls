@@ -1,15 +1,41 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Open Multiple URLs - 设置</title>
+    <title>批量打开URL - 设置</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        pink: {
+                            50: '#fdf2f8',
+                            100: '#fce7f3',
+                            200: '#fbcfe8',
+                            300: '#f9a8d4',
+                            400: '#f472b6',
+                            500: '#ec4899',
+                            600: '#db2777',
+                            700: '#be185d',
+                            800: '#9d174d',
+                            900: '#831843',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body {
             background: linear-gradient(135deg, #fdf2f8 0%, #ffffff 100%);
             min-height: 100vh;
             padding: 2rem;
+        }
+        .dark body {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
         }
         .container {
             max-width: 800px;
@@ -19,10 +45,16 @@
             border-radius: 1rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
+        .dark .container {
+            background: #1f2937;
+        }
         .section {
             margin-bottom: 2rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid #f3f4f6;
+        }
+        .dark .section {
+            border-bottom-color: #374151;
         }
         .section:last-child {
             border-bottom: none;
@@ -35,6 +67,9 @@
             color: #db2777;
             margin-bottom: 1rem;
         }
+        .dark .section-title {
+            color: #f472b6;
+        }
         .form-group {
             margin-bottom: 1rem;
         }
@@ -45,6 +80,9 @@
             color: #4b5563;
             margin-bottom: 0.5rem;
         }
+        .dark .form-label {
+            color: #9ca3af;
+        }
         .form-input {
             width: 100%;
             padding: 0.5rem;
@@ -52,11 +90,21 @@
             border-radius: 0.375rem;
             font-size: 0.875rem;
             color: #1f2937;
+            background-color: white;
+        }
+        .dark .form-input {
+            background-color: #374151;
+            border-color: #4b5563;
+            color: #f3f4f6;
         }
         .form-input:focus {
             outline: none;
             border-color: #db2777;
             box-shadow: 0 0 0 2px rgba(219, 39, 119, 0.1);
+        }
+        .dark .form-input:focus {
+            border-color: #f472b6;
+            box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.1);
         }
         .form-select {
             width: 100%;
@@ -67,10 +115,19 @@
             color: #1f2937;
             background-color: white;
         }
+        .dark .form-select {
+            background-color: #374151;
+            border-color: #4b5563;
+            color: #f3f4f6;
+        }
         .form-select:focus {
             outline: none;
             border-color: #db2777;
             box-shadow: 0 0 0 2px rgba(219, 39, 119, 0.1);
+        }
+        .dark .form-select:focus {
+            border-color: #f472b6;
+            box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.1);
         }
         .checkbox-group {
             display: flex;
@@ -81,9 +138,15 @@
             margin-right: 0.5rem;
             color: #db2777;
         }
+        .dark .checkbox-input {
+            color: #f472b6;
+        }
         .checkbox-label {
             font-size: 0.875rem;
             color: #4b5563;
+        }
+        .dark .checkbox-label {
+            color: #9ca3af;
         }
         .button {
             padding: 0.5rem 1rem;
@@ -106,8 +169,16 @@
             color: #db2777;
             border: 1px solid #db2777;
         }
+        .dark .button-secondary {
+            background: #374151;
+            color: #f472b6;
+            border-color: #f472b6;
+        }
         .button-secondary:hover {
             background: #fdf2f8;
+        }
+        .dark .button-secondary:hover {
+            background: #374151;
         }
         .status {
             margin-top: 1rem;
@@ -119,131 +190,79 @@
             background-color: #dcfce7;
             color: #166534;
         }
+        .dark .status-success {
+            background-color: #064e3b;
+            color: #6ee7b7;
+        }
         .status-error {
             background-color: #fee2e2;
             color: #991b1b;
         }
+        .dark .status-error {
+            background-color: #7f1d1d;
+            color: #fecaca;
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1 class="text-2xl font-bold text-pink-600 mb-6">Open Multiple URLs - 设置</h1>
-
-        <!-- 基本设置 -->
-        <div class="section">
-            <h2 class="section-title">基本设置</h2>
-            <div class="form-group">
-                <label class="form-label">最大 URL 数量</label>
-                <input type="number" id="maxUrls" class="form-input" min="1" max="100" value="20">
+<body class="bg-gradient-to-br from-pink-50 to-white dark:from-gray-900 dark:to-gray-800 min-h-screen text-gray-900 dark:text-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl font-bold text-pink-600 dark:text-pink-400 mb-8" id="title"></h1>
+            
+            <!-- 语言设置 -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-xl font-semibold text-pink-600 dark:text-pink-400 mb-4" id="language"></h2>
+                <div class="flex items-center space-x-4">
+                    <select id="languageSelect" class="form-select">
+                        <option value="zh">中文</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
             </div>
-            <div class="form-group">
-                <label class="form-label">打开顺序</label>
-                <select id="openOrder" class="form-select">
-                    <option value="normal">正常顺序</option>
-                    <option value="reverse">反向顺序</option>
-                    <option value="random">随机顺序</option>
-                </select>
+
+            <!-- 主题设置 -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-xl font-semibold text-pink-600 dark:text-pink-400 mb-4" id="theme"></h2>
+                <div class="flex items-center space-x-4">
+                    <button id="themeToggle" class="p-2 rounded-full hover:bg-pink-100 dark:hover:bg-gray-700">
+                        <svg id="sunIcon" class="w-6 h-6 text-pink-600 dark:text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <svg id="moonIcon" class="w-6 h-6 text-pink-600 dark:text-pink-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 关于 -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-pink-600 dark:text-pink-400 mb-4" id="about"></h2>
+                <div class="space-y-4">
+                    <p class="text-gray-600 dark:text-gray-300" id="version"></p>
+                    <p class="text-gray-600 dark:text-gray-300" id="description"></p>
+                    <h3 class="text-lg font-medium text-pink-600 dark:text-pink-400 mt-6" id="features"></h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-300">
+                        <li id="feature1"></li>
+                        <li id="feature2"></li>
+                        <li id="feature3"></li>
+                        <li id="feature4"></li>
+                        <li id="feature5"></li>
+                        <li id="feature6"></li>
+                        <li id="feature7"></li>
+                        <li id="feature8"></li>
+                        <li id="feature9"></li>
+                        <li id="feature10"></li>
+                        <li id="feature11"></li>
+                        <li id="feature12"></li>
+                        <li id="feature13"></li>
+                        <li id="feature14"></li>
+                        <li id="feature15"></li>
+                    </ul>
+                </div>
             </div>
         </div>
-
-        <!-- URL 处理设置 -->
-        <div class="section">
-            <h2 class="section-title">URL 处理设置</h2>
-            <div class="checkbox-group">
-                <input type="checkbox" id="removeDuplicates" class="checkbox-input">
-                <label class="checkbox-label">自动去除重复 URL</label>
-            </div>
-            <div class="checkbox-group">
-                <input type="checkbox" id="validateUrls" class="checkbox-input">
-                <label class="checkbox-label">验证 URL 有效性</label>
-            </div>
-            <div class="checkbox-group">
-                <input type="checkbox" id="autoProtocol" class="checkbox-input">
-                <label class="checkbox-label">自动添加 https:// 协议</label>
-            </div>
-        </div>
-
-        <!-- 标签页设置 -->
-        <div class="section">
-            <h2 class="section-title">标签页设置</h2>
-            <div class="form-group">
-                <label class="form-label">标签页分组</label>
-                <select id="groupOption" class="form-select">
-                    <option value="none">不分组</option>
-                    <option value="new">创建新分组</option>
-                    <option value="existing">添加到现有分组</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">URL 分类</label>
-                <select id="urlCategory" class="form-select">
-                    <option value="none">不分类</option>
-                    <option value="domain">按域名分类</option>
-                    <option value="custom">自定义分类</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- 安全设置 -->
-        <div class="section">
-            <h2 class="section-title">安全设置</h2>
-            <div class="checkbox-group">
-                <input type="checkbox" id="checkSecurity" class="checkbox-input">
-                <label class="checkbox-label">启用 URL 安全检查</label>
-            </div>
-            <div class="form-group">
-                <label class="form-label">黑名单 URL</label>
-                <textarea id="blacklist" class="form-input" rows="4" placeholder="每行一个 URL"></textarea>
-            </div>
-            <div class="form-group">
-                <label class="form-label">白名单 URL</label>
-                <textarea id="whitelist" class="form-input" rows="4" placeholder="每行一个 URL"></textarea>
-            </div>
-        </div>
-
-        <!-- 缓存设置 -->
-        <div class="section">
-            <h2 class="section-title">缓存设置</h2>
-            <div class="form-group">
-                <label class="form-label">最大缓存条目数</label>
-                <input type="number" id="maxCacheSize" class="form-input" min="100" max="10000" value="1000">
-            </div>
-            <div class="form-group">
-                <label class="form-label">缓存过期时间（小时）</label>
-                <input type="number" id="cacheExpiry" class="form-input" min="1" max="168" value="24">
-            </div>
-        </div>
-
-        <!-- 界面设置 -->
-        <div class="section">
-            <h2 class="section-title">界面设置</h2>
-            <div class="form-group">
-                <label class="form-label">主题</label>
-                <select id="theme" class="form-select">
-                    <option value="light">浅色</option>
-                    <option value="dark">深色</option>
-                    <option value="system">跟随系统</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">语言</label>
-                <select id="language" class="form-select">
-                    <option value="zh-CN">简体中文</option>
-                    <option value="en-US">English</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- 按钮 -->
-        <div class="flex justify-end space-x-4 mt-6">
-            <button id="resetButton" class="button button-secondary">重置设置</button>
-            <button id="saveButton" class="button button-primary">保存设置</button>
-        </div>
-
-        <!-- 状态提示 -->
-        <div id="status" class="status hidden"></div>
     </div>
-
-    <script src="options.js"></script>
+    <script type="module" src="options.js"></script>
 </body>
 </html> 
