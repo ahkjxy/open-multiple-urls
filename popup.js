@@ -1,4 +1,15 @@
+import { URLProcessor } from './modules/url-processor.js';
+import { CacheManager } from './modules/cache-manager.js';
+import { SecurityChecker } from './modules/security-checker.js';
+import { I18n } from './modules/i18n.js';
+
 document.addEventListener('DOMContentLoaded', function() {
+  // 初始化模块
+  const urlProcessor = new URLProcessor();
+  const cacheManager = new CacheManager();
+  const securityChecker = new SecurityChecker();
+  const i18n = new I18n();
+
   // 获取DOM元素
   const urlInput = document.getElementById('urlInput');
   const openOrder = document.getElementById('openOrder');
@@ -25,8 +36,74 @@ document.addEventListener('DOMContentLoaded', function() {
   const urlPreviewList = document.getElementById('urlPreviewList');
   const closePreview = document.getElementById('closePreview');
   const confirmOpen = document.getElementById('confirmOpen');
+  const themeToggle = document.getElementById('themeToggle');
+  const sunIcon = document.getElementById('sunIcon');
+  const moonIcon = document.getElementById('moonIcon');
+  const languageSelect = document.getElementById('languageSelect');
 
   let pendingUrls = [];
+  let isDarkMode = false;
+
+  // 更新界面文本
+  const updateUIText = () => {
+    document.title = i18n.t('title');
+    document.querySelector('h1').textContent = i18n.t('title');
+    document.querySelector('label[for="urlInput"]').textContent = i18n.t('urlInputLabel');
+    importUrlsButton.textContent = i18n.t('import');
+    exportUrlsButton.textContent = i18n.t('export');
+    openUrlsButton.textContent = i18n.t('openUrls');
+    extractUrlsButton.textContent = i18n.t('extractUrls');
+    document.querySelector('label[for="delayLoad"]').textContent = i18n.t('delayLoad');
+    document.querySelector('label[for="preserveInput"]').textContent = i18n.t('preserveInput');
+    document.querySelector('label[for="removeDuplicates"]').textContent = i18n.t('removeDuplicates');
+    document.querySelector('label[for="searchNonUrls"]').textContent = i18n.t('searchNonUrls');
+    document.querySelector('label[for="validateUrls"]').textContent = i18n.t('validateUrls');
+    document.querySelector('label[for="autoProtocol"]').textContent = i18n.t('autoProtocol');
+    document.querySelector('label[for="openOrder"]').textContent = i18n.t('openOrder');
+    document.querySelector('label[for="groupOption"]').textContent = i18n.t('groupOption');
+    document.querySelector('label[for="urlCategory"]').textContent = i18n.t('urlCategory');
+    document.querySelector('label[for="maxUrls"]').textContent = i18n.t('maxUrls');
+    document.querySelector('#urlPreviewModal h3').textContent = i18n.t('urlPreview');
+    closePreview.textContent = i18n.t('close');
+    confirmOpen.textContent = i18n.t('confirmOpen');
+
+    // 更新选项文本
+    openOrder.innerHTML = `
+      <option value="normal">${i18n.t('openOrderNormal')}</option>
+      <option value="reverse">${i18n.t('openOrderReverse')}</option>
+      <option value="random">${i18n.t('openOrderRandom')}</option>
+    `;
+
+    groupOption.innerHTML = `
+      <option value="none">${i18n.t('groupOptionNone')}</option>
+      <option value="new">${i18n.t('groupOptionNew')}</option>
+      <option value="existing">${i18n.t('groupOptionExisting')}</option>
+    `;
+
+    urlCategory.innerHTML = `
+      <option value="none">${i18n.t('urlCategoryNone')}</option>
+      <option value="domain">${i18n.t('urlCategoryDomain')}</option>
+      <option value="custom">${i18n.t('urlCategoryCustom')}</option>
+    `;
+
+    // 更新占位符文本
+    urlInput.placeholder = i18n.t('urlInputPlaceholder');
+  };
+
+  // 切换深色模式
+  const toggleDarkMode = () => {
+    isDarkMode = !isDarkMode;
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      sunIcon.classList.add('hidden');
+      moonIcon.classList.remove('hidden');
+    } else {
+      document.documentElement.classList.remove('dark');
+      sunIcon.classList.remove('hidden');
+      moonIcon.classList.add('hidden');
+    }
+    chrome.storage.local.set({ darkMode: isDarkMode });
+  };
 
   // 从Chrome Storage恢复设置和URL
   const restoreSettings = async () => {
@@ -42,12 +119,15 @@ document.addEventListener('DOMContentLoaded', function() {
           openOrder: 'normal',
           groupOption: 'none',
           urlCategory: 'none',
-          maxUrls: 20
+          maxUrls: 20,
+          checkSecurity: true
         },
-        lastUrls: ''
+        lastUrls: '',
+        darkMode: false,
+        locale: 'zh'
       });
 
-      const { settings, lastUrls } = result;
+      const { settings, lastUrls, darkMode, locale } = result;
       
       delayLoad.checked = settings.delayLoad;
       preserveInput.checked = settings.preserveInput;
@@ -59,6 +139,25 @@ document.addEventListener('DOMContentLoaded', function() {
       groupOption.value = settings.groupOption;
       urlCategory.value = settings.urlCategory;
       maxUrls.value = settings.maxUrls;
+
+      // 恢复深色模式
+      isDarkMode = darkMode;
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+        sunIcon.classList.add('hidden');
+        moonIcon.classList.remove('hidden');
+      } else {
+        document.documentElement.classList.remove('dark');
+        sunIcon.classList.remove('hidden');
+        moonIcon.classList.add('hidden');
+      }
+
+      // 恢复语言设置
+      if (locale) {
+        i18n.setLocale(locale);
+        languageSelect.value = locale;
+        updateUIText();
+      }
 
       // 恢复上次的URL列表
       if (lastUrls) {
@@ -89,135 +188,43 @@ document.addEventListener('DOMContentLoaded', function() {
       // 保存设置和URL列表
       await chrome.storage.local.set({
         settings,
-        lastUrls: urlInput.value
+        lastUrls: urlInput.value,
+        darkMode: isDarkMode,
+        locale: i18n.getLocale()
       });
     } catch (error) {
       console.error('保存设置失败:', error);
     }
   };
 
-  // URL验证函数
-  const isValidUrl = (url) => {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  };
-
-  // 处理URL格式
-  const processUrl = (url) => {
-    try {
-      url = url.trim();
-      if (url === '') return null;
-
-      // 提取URL部分（如果有前缀数字和描述，只保留URL）
-      const urlMatch = url.match(/(?:https?:\/\/)?[\w-]+(?:\.[\w-]+)+(?:[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/i);
-      if (!urlMatch) {
-        console.log(`未找到有效URL: ${url}`);
-        return null;
-      }
-      url = urlMatch[0];
-
-      // 添加协议前缀
-      if (autoProtocol.checked && !url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
-        console.log(`添加协议前缀: ${url}`);
-      }
-
-      // 验证URL
-      if (validateUrls.checked && !isValidUrl(url)) {
-        console.log(`无效的URL: ${url}`);
-        return null;
-      }
-
-      return url;
-    } catch (error) {
-      console.error(`处理URL时出错: ${error.message}`);
-      return null;
-    }
-  };
-
   // 更新URL计数
   const updateUrlCount = () => {
     const urls = urlInput.value.split('\n').filter(url => url.trim() !== '');
-    const validUrls = urls.filter(url => processUrl(url) !== null);
-    urlCount.textContent = `${urls.length} 个URL`;
-    validUrlCount.textContent = `${validUrls.length} 个有效URL`;
-  };
-
-  // 提取URL的函数
-  function extractUrls(text) {
-    // 1. 首先尝试匹配标准URL格式
-    const standardUrlRegex = /(https?:\/\/[^\s<>"]+)/g;
-    let urls = text.match(standardUrlRegex) || [];
-
-    // 2. 如果没有找到标准URL，尝试匹配其他格式
-    if (urls.length === 0) {
-      // 匹配形如 "数字--数字，URL" 的格式
-      const numberedUrlRegex = /(?:\d+--\d+[，,]\s*)?((?:https?:\/\/)?[\w-]+(?:\.[\w-]+)+(?:[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?)/gi;
-      const matches = text.matchAll(numberedUrlRegex);
-      urls = Array.from(matches, m => m[1]);
-    }
-
-    // 3. 清理和验证URL
-    return urls
-      .map(url => {
-        // 移除URL前后的空白字符和标点符号
-        url = url.trim().replace(/^[.,，。\s]+|[.,，。\s]+$/g, '');
-        
-        // 如果URL不包含协议，添加https://
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-          url = 'https://' + url;
-        }
-        
-        return url;
-      })
-      .filter(url => {
-        // 过滤掉无效的URL
-        if (!url) return false;
-        
-        // 检查URL是否包含有效的域名
-        try {
-          const urlObj = new URL(url);
-          return urlObj.hostname.includes('.');
-        } catch {
-          return false;
-        }
-      });
-  }
-
-  // 按域名分类URL
-  const groupUrlsByDomain = (urls) => {
-    const groups = {};
-    urls.forEach(url => {
-      try {
-        const domain = new URL(url).hostname;
-        if (!groups[domain]) {
-          groups[domain] = [];
-        }
-        groups[domain].push(url);
-      } catch (error) {
-        console.error(`处理域名时出错: ${error.message}`);
-      }
-    });
-    return groups;
+    const validUrls = urls.filter(url => urlProcessor.preprocessUrl(url, autoProtocol.checked) !== null);
+    urlCount.textContent = i18n.t('urlCount', { count: urls.length });
+    validUrlCount.textContent = i18n.t('validUrlCount', { count: validUrls.length });
   };
 
   // 显示URL预览
-  const showUrlPreview = (urls) => {
+  const showUrlPreview = async (urls) => {
     urlPreviewList.innerHTML = '';
-    urls.forEach((url, index) => {
+    
+    for (const [index, url] of urls.entries()) {
       const div = document.createElement('div');
-      div.className = 'flex items-center space-x-2 p-2 hover:bg-pink-50 rounded';
+      div.className = 'flex items-center space-x-2 p-2 hover:bg-pink-50 dark:hover:bg-gray-700 rounded';
+      
+      // 获取URL元数据
+      const metadata = await cacheManager.get(url) || await urlProcessor.getUrlMetadata(url);
+      const title = metadata?.title || url;
+      
       div.innerHTML = `
-        <input type="checkbox" class="rounded text-pink-500 border-pink-300" checked>
-        <span class="text-sm text-pink-600">${index + 1}.</span>
-        <span class="text-sm text-pink-600 truncate">${url}</span>
+        <input type="checkbox" class="rounded text-pink-500 border-pink-300 dark:border-gray-600" checked>
+        <span class="text-sm text-pink-600 dark:text-pink-400">${index + 1}.</span>
+        <span class="text-sm text-pink-600 dark:text-pink-400 truncate" title="${url}">${title}</span>
       `;
       urlPreviewList.appendChild(div);
-    });
+    }
+    
     urlPreviewModal.classList.remove('hidden');
     urlPreviewModal.classList.add('flex');
   };
@@ -233,6 +240,13 @@ document.addEventListener('DOMContentLoaded', function() {
       if (urls.length > maxUrls.value) {
         urls = urls.slice(0, maxUrls.value);
         console.log(`URL数量超过限制，已截取前 ${maxUrls.value} 个`);
+      }
+
+      // 安全检查
+      const securityResults = await securityChecker.checkUrls(urls);
+      const unsafeUrls = securityResults.filter(result => !result.safe);
+      if (unsafeUrls.length > 0) {
+        console.warn('发现不安全的URL:', unsafeUrls);
       }
 
       console.log(`准备打开 ${urls.length} 个URL`);
@@ -333,35 +347,59 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   };
 
+  // 按域名分类URL
+  const groupUrlsByDomain = (urls) => {
+    const groups = {};
+    urls.forEach(url => {
+      try {
+        const domain = new URL(url).hostname;
+        if (!groups[domain]) {
+          groups[domain] = [];
+        }
+        groups[domain].push(url);
+      } catch (error) {
+        console.error(`处理域名时出错: ${error.message}`);
+      }
+    });
+    return groups;
+  };
+
   // 导入URL
   const importUrls = () => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.txt,.json';
-    input.onchange = (e) => {
+    input.accept = '.txt,.json,.csv';
+    input.onchange = async (e) => {
       const file = e.target.files[0];
       if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          try {
-            let content = e.target.result;
-            if (file.name.endsWith('.json')) {
-              const data = JSON.parse(content);
-              content = Array.isArray(data) ? data.join('\n') : data.urls.join('\n');
-            }
-            urlInput.value = content;
-            updateUrlCount();
-            statusDiv.textContent = 'URL导入成功';
-            statusDiv.classList.remove('hidden', 'text-red-600');
-            statusDiv.classList.add('text-green-600');
-          } catch (error) {
-            console.error('导入文件失败:', error);
-            statusDiv.textContent = '导入文件失败：文件格式不正确';
-            statusDiv.classList.remove('hidden', 'text-green-600');
-            statusDiv.classList.add('text-red-600');
+        try {
+          const content = await file.text();
+          let urls = [];
+
+          if (file.name.endsWith('.json')) {
+            const data = JSON.parse(content);
+            urls = Array.isArray(data) ? data : data.urls;
+          } else if (file.name.endsWith('.csv')) {
+            urls = content.split('\n')
+              .map(line => line.split(',')[0].trim())
+              .filter(url => url);
+          } else {
+            urls = content.split('\n')
+              .map(line => line.trim())
+              .filter(line => line);
           }
-        };
-        reader.readAsText(file);
+
+          urlInput.value = urls.join('\n');
+          updateUrlCount();
+          statusDiv.textContent = i18n.t('importSuccess');
+          statusDiv.classList.remove('hidden', 'text-red-600');
+          statusDiv.classList.add('text-green-600');
+        } catch (error) {
+          console.error('导入文件失败:', error);
+          statusDiv.textContent = i18n.t('importError');
+          statusDiv.classList.remove('hidden', 'text-green-600');
+          statusDiv.classList.add('text-red-600');
+        }
       }
     };
     input.click();
@@ -372,22 +410,43 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
       const urls = urlInput.value.split('\n').filter(url => url.trim() !== '');
       if (urls.length === 0) {
-        throw new Error('没有可导出的URL');
+        throw new Error(i18n.t('noUrlsToExport'));
       }
-      const content = JSON.stringify({ urls }, null, 2);
-      const blob = new Blob([content], { type: 'application/json' });
+
+      const format = 'json'; // 可以根据需要支持其他格式
+      let content, type, filename;
+
+      switch (format) {
+        case 'json':
+          content = JSON.stringify({ urls }, null, 2);
+          type = 'application/json';
+          filename = 'urls.json';
+          break;
+        case 'csv':
+          content = urls.map(url => `${url},`).join('\n');
+          type = 'text/csv';
+          filename = 'urls.csv';
+          break;
+        default:
+          content = urls.join('\n');
+          type = 'text/plain';
+          filename = 'urls.txt';
+      }
+
+      const blob = new Blob([content], { type });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'urls.json';
+      a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
-      statusDiv.textContent = 'URL导出成功';
+
+      statusDiv.textContent = i18n.t('exportSuccess');
       statusDiv.classList.remove('hidden', 'text-red-600');
       statusDiv.classList.add('text-green-600');
     } catch (error) {
       console.error('导出URL失败:', error);
-      statusDiv.textContent = `导出失败: ${error.message}`;
+      statusDiv.textContent = i18n.t('exportError', { message: error.message });
       statusDiv.classList.remove('hidden', 'text-green-600');
       statusDiv.classList.add('text-red-600');
     }
@@ -401,12 +460,12 @@ document.addEventListener('DOMContentLoaded', function() {
   
   openUrlsButton.addEventListener('click', async () => {
     try {
-      statusDiv.textContent = '正在处理URL...';
+      statusDiv.textContent = i18n.t('processing');
       statusDiv.classList.remove('hidden');
 
       // 获取并处理URL列表
       let urls = urlInput.value.split('\n')
-        .map(processUrl)
+        .map(url => urlProcessor.preprocessUrl(url, autoProtocol.checked))
         .filter(url => url !== null);
 
       console.log(`处理后的URL数量: ${urls.length}`);
@@ -421,10 +480,10 @@ document.addEventListener('DOMContentLoaded', function() {
       // 保存待处理的URL列表
       pendingUrls = urls;
       // 显示URL预览
-      showUrlPreview(urls);
+      await showUrlPreview(urls);
     } catch (error) {
       console.error('操作失败:', error);
-      statusDiv.textContent = `发生错误: ${error.message}`;
+      statusDiv.textContent = i18n.t('error', { message: error.message });
       statusDiv.classList.remove('hidden', 'text-green-600');
       statusDiv.classList.add('text-red-600');
     }
@@ -438,14 +497,14 @@ document.addEventListener('DOMContentLoaded', function() {
         .filter(url => url !== null);
 
       if (urls.length === 0) {
-        throw new Error('请至少选择一个URL');
+        throw new Error(i18n.t('selectAtLeastOne'));
       }
 
       urlPreviewModal.classList.add('hidden');
       urlPreviewModal.classList.remove('flex');
       
       const count = await openUrls(urls);
-      statusDiv.textContent = `成功打开 ${count} 个URL`;
+      statusDiv.textContent = i18n.t('success', { count });
       statusDiv.classList.remove('hidden', 'text-red-600');
       statusDiv.classList.add('text-green-600');
 
@@ -453,7 +512,7 @@ document.addEventListener('DOMContentLoaded', function() {
       saveSettings();
     } catch (error) {
       console.error('操作失败:', error);
-      statusDiv.textContent = `发生错误: ${error.message}`;
+      statusDiv.textContent = i18n.t('error', { message: error.message });
       statusDiv.classList.remove('hidden', 'text-green-600');
       statusDiv.classList.add('text-red-600');
     }
@@ -467,15 +526,15 @@ document.addEventListener('DOMContentLoaded', function() {
   extractUrlsButton.addEventListener('click', () => {
     try {
       const text = urlInput.value;
-      const urls = extractUrls(text);
+      const urls = urlProcessor.process(text.split('\n'));
       urlInput.value = urls.join('\n');
       updateUrlCount();
-      statusDiv.textContent = `已提取 ${urls.length} 个URL`;
+      statusDiv.textContent = i18n.t('success', { count: urls.length });
       statusDiv.classList.remove('hidden', 'text-red-600');
       statusDiv.classList.add('text-green-600');
     } catch (error) {
       console.error('提取URL失败:', error);
-      statusDiv.textContent = `提取URL失败: ${error.message}`;
+      statusDiv.textContent = i18n.t('error', { message: error.message });
       statusDiv.classList.remove('hidden', 'text-green-600');
       statusDiv.classList.add('text-red-600');
     }
@@ -487,6 +546,19 @@ document.addEventListener('DOMContentLoaded', function() {
   // 监听设置变更
   [delayLoad, preserveInput, removeDuplicates, searchNonUrls, validateUrls, autoProtocol, openOrder, groupOption, urlCategory, maxUrls].forEach(element => {
     element.addEventListener('change', saveSettings);
+  });
+
+  // 监听主题切换
+  themeToggle.addEventListener('click', toggleDarkMode);
+
+  // 监听语言切换
+  languageSelect.addEventListener('change', async (e) => {
+    const locale = e.target.value;
+    if (i18n.setLocale(locale)) {
+      updateUIText();
+      await i18n.saveLocale();
+      saveSettings();
+    }
   });
 
   // 初始化时恢复设置

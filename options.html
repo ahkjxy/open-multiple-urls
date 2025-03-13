@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Multiple URLs - 设置</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #fdf2f8 0%, #ffffff 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .section {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #db2777;
+            margin-bottom: 1rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            color: #1f2937;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #db2777;
+            box-shadow: 0 0 0 2px rgba(219, 39, 119, 0.1);
+        }
+        .form-select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            color: #1f2937;
+            background-color: white;
+        }
+        .form-select:focus {
+            outline: none;
+            border-color: #db2777;
+            box-shadow: 0 0 0 2px rgba(219, 39, 119, 0.1);
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .checkbox-input {
+            margin-right: 0.5rem;
+            color: #db2777;
+        }
+        .checkbox-label {
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+        .button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .button-primary {
+            background: linear-gradient(135deg, #db2777 0%, #ec4899 100%);
+            color: white;
+            border: none;
+        }
+        .button-primary:hover {
+            opacity: 0.9;
+        }
+        .button-secondary {
+            background: white;
+            color: #db2777;
+            border: 1px solid #db2777;
+        }
+        .button-secondary:hover {
+            background: #fdf2f8;
+        }
+        .status {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+        .status-success {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        .status-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-2xl font-bold text-pink-600 mb-6">Open Multiple URLs - 设置</h1>
+
+        <!-- 基本设置 -->
+        <div class="section">
+            <h2 class="section-title">基本设置</h2>
+            <div class="form-group">
+                <label class="form-label">最大 URL 数量</label>
+                <input type="number" id="maxUrls" class="form-input" min="1" max="100" value="20">
+            </div>
+            <div class="form-group">
+                <label class="form-label">打开顺序</label>
+                <select id="openOrder" class="form-select">
+                    <option value="normal">正常顺序</option>
+                    <option value="reverse">反向顺序</option>
+                    <option value="random">随机顺序</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- URL 处理设置 -->
+        <div class="section">
+            <h2 class="section-title">URL 处理设置</h2>
+            <div class="checkbox-group">
+                <input type="checkbox" id="removeDuplicates" class="checkbox-input">
+                <label class="checkbox-label">自动去除重复 URL</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="validateUrls" class="checkbox-input">
+                <label class="checkbox-label">验证 URL 有效性</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="autoProtocol" class="checkbox-input">
+                <label class="checkbox-label">自动添加 https:// 协议</label>
+            </div>
+        </div>
+
+        <!-- 标签页设置 -->
+        <div class="section">
+            <h2 class="section-title">标签页设置</h2>
+            <div class="form-group">
+                <label class="form-label">标签页分组</label>
+                <select id="groupOption" class="form-select">
+                    <option value="none">不分组</option>
+                    <option value="new">创建新分组</option>
+                    <option value="existing">添加到现有分组</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">URL 分类</label>
+                <select id="urlCategory" class="form-select">
+                    <option value="none">不分类</option>
+                    <option value="domain">按域名分类</option>
+                    <option value="custom">自定义分类</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 安全设置 -->
+        <div class="section">
+            <h2 class="section-title">安全设置</h2>
+            <div class="checkbox-group">
+                <input type="checkbox" id="checkSecurity" class="checkbox-input">
+                <label class="checkbox-label">启用 URL 安全检查</label>
+            </div>
+            <div class="form-group">
+                <label class="form-label">黑名单 URL</label>
+                <textarea id="blacklist" class="form-input" rows="4" placeholder="每行一个 URL"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">白名单 URL</label>
+                <textarea id="whitelist" class="form-input" rows="4" placeholder="每行一个 URL"></textarea>
+            </div>
+        </div>
+
+        <!-- 缓存设置 -->
+        <div class="section">
+            <h2 class="section-title">缓存设置</h2>
+            <div class="form-group">
+                <label class="form-label">最大缓存条目数</label>
+                <input type="number" id="maxCacheSize" class="form-input" min="100" max="10000" value="1000">
+            </div>
+            <div class="form-group">
+                <label class="form-label">缓存过期时间（小时）</label>
+                <input type="number" id="cacheExpiry" class="form-input" min="1" max="168" value="24">
+            </div>
+        </div>
+
+        <!-- 界面设置 -->
+        <div class="section">
+            <h2 class="section-title">界面设置</h2>
+            <div class="form-group">
+                <label class="form-label">主题</label>
+                <select id="theme" class="form-select">
+                    <option value="light">浅色</option>
+                    <option value="dark">深色</option>
+                    <option value="system">跟随系统</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">语言</label>
+                <select id="language" class="form-select">
+                    <option value="zh-CN">简体中文</option>
+                    <option value="en-US">English</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 按钮 -->
+        <div class="flex justify-end space-x-4 mt-6">
+            <button id="resetButton" class="button button-secondary">重置设置</button>
+            <button id="saveButton" class="button button-primary">保存设置</button>
+        </div>
+
+        <!-- 状态提示 -->
+        <div id="status" class="status hidden"></div>
+    </div>
+
+    <script src="options.js"></script>
+</body>
+</html> 

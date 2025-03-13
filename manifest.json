@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Open Multiple URLs",
-  "version": "1.0",
+  "version": "1.3.0",
   "description": "Efficiently open and manage multiple URLs in Chrome. Batch open links, organize them into groups, and boost your productivity.",
   "icons": {
     "16": "icons/icon16.png",
@@ -19,8 +19,22 @@
   "permissions": [
     "tabs",
     "tabGroups",
-    "storage"
+    "storage",
+    "alarms",
+    "notifications",
+    "webNavigation",
+    "webRequest",
+    "downloads"
   ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "options_page": "options.html",
   "author": "ahkjxy",
-  "homepage_url": "https://github.com/ahkjxy/open-multiple-urls"
+  "homepage_url": "https://github.com/ahkjxy/open-multiple-urls",
+  "minimum_chrome_version": "88"
 }

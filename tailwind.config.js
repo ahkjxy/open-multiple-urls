@@ -2,8 +2,10 @@
 module.exports = {
   content: [
     "./popup.html",
-    "./popup.js"
+    "./popup.js",
+    "./modules/**/*.js"
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -18,8 +20,8 @@ module.exports = {
           700: '#be185d',
           800: '#9d174d',
           900: '#831843',
-        }
-      }
+        },
+      },
     },
   },
   plugins: [],

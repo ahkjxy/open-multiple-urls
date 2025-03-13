@@ -6,26 +6,42 @@
   <title>Open Multiple URLs</title>
   <link href="./dist/output.css" rel="stylesheet">
 </head>
-<body class="w-[500px] p-5 bg-gradient-to-b from-pink-50 to-white">
+<body class="w-[500px] p-5 bg-gradient-to-b from-pink-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
   <div class="space-y-4">
-    <!-- 标题 -->
-    <h1 class="text-2xl font-bold text-pink-700 text-center mb-2">批量打开URL</h1>
+    <!-- 标题栏 -->
+    <div class="flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-pink-700 dark:text-pink-400 text-center">批量打开URL</h1>
+      <div class="flex items-center space-x-2">
+        <select id="languageSelect" class="rounded-lg border border-pink-200 dark:border-gray-600 py-1.5 px-3 text-sm text-pink-600 dark:text-pink-400 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 bg-white dark:bg-gray-800">
+          <option value="zh">中文</option>
+          <option value="en">English</option>
+        </select>
+        <button id="themeToggle" class="p-2 rounded-lg hover:bg-pink-100 dark:hover:bg-gray-700 transition-colors" title="切换主题">
+          <svg id="sunIcon" class="w-5 h-5 text-pink-600 dark:text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+          <svg id="moonIcon" class="w-5 h-5 text-pink-600 dark:text-pink-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
     
     <!-- URL输入区域 -->
-    <div class="space-y-2 bg-white rounded-xl p-4 shadow-sm border border-pink-100">
+    <div class="space-y-2 bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-pink-100 dark:border-gray-700">
       <div class="flex justify-between items-center">
-        <label class="block text-sm font-medium text-pink-700">输入URL列表（每行一个）</label>
+        <label class="block text-sm font-medium text-pink-700 dark:text-pink-400">输入URL列表（每行一个）</label>
         <div class="flex space-x-3">
-          <button id="importUrls" class="text-sm text-pink-600 hover:text-pink-700 transition-colors">导入</button>
-          <button id="exportUrls" class="text-sm text-pink-600 hover:text-pink-700 transition-colors">导出</button>
+          <button id="importUrls" class="text-sm text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 transition-colors">导入</button>
+          <button id="exportUrls" class="text-sm text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 transition-colors">导出</button>
         </div>
       </div>
       <textarea
         id="urlInput"
-        class="w-full h-40 p-3 border border-pink-200 rounded-lg shadow-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500 bg-white text-sm"
+        class="w-full h-40 p-3 border border-pink-200 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-gray-100"
         placeholder="https://example.com
 https://example.org"></textarea>
-      <div class="flex justify-between text-xs text-pink-500">
+      <div class="flex justify-between text-xs text-pink-500 dark:text-pink-400">
         <span id="urlCount">0 个URL</span>
         <span id="validUrlCount">0 个有效URL</span>
       </div>
@@ -40,47 +56,47 @@ https://example.org"></textarea>
       </button>
       <button
         id="extractUrls"
-        class="flex-1 py-2.5 px-4 border-2 border-pink-300 bg-white text-pink-600 rounded-lg hover:bg-pink-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition-all shadow-sm hover:shadow-md">
+        class="flex-1 py-2.5 px-4 border-2 border-pink-300 dark:border-pink-500 bg-white dark:bg-gray-800 text-pink-600 dark:text-pink-400 rounded-lg hover:bg-pink-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition-all shadow-sm hover:shadow-md">
         提取URL
       </button>
     </div>
 
     <!-- 选项设置 -->
-    <div class="bg-white p-4 rounded-xl shadow-sm border border-pink-100">
+    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-pink-100 dark:border-gray-700">
       <div class="grid grid-cols-2 gap-3">
         <div class="flex items-center space-x-2 cursor-pointer group">
-          <input type="checkbox" id="delayLoad" class="rounded text-pink-500 border-pink-300 focus:ring-pink-500">
-          <label for="delayLoad" class="text-sm text-pink-600 group-hover:text-pink-700 transition-colors">延迟加载</label>
+          <input type="checkbox" id="delayLoad" class="rounded text-pink-500 border-pink-300 dark:border-gray-600 focus:ring-pink-500">
+          <label for="delayLoad" class="text-sm text-pink-600 dark:text-pink-400 group-hover:text-pink-700 dark:group-hover:text-pink-300 transition-colors">延迟加载</label>
         </div>
 
         <div class="flex items-center space-x-2 cursor-pointer group">
-          <input type="checkbox" id="preserveInput" class="rounded text-pink-500 border-pink-300 focus:ring-pink-500">
-          <label for="preserveInput" class="text-sm text-pink-600 group-hover:text-pink-700 transition-colors">保留输入</label>
+          <input type="checkbox" id="preserveInput" class="rounded text-pink-500 border-pink-300 dark:border-gray-600 focus:ring-pink-500">
+          <label for="preserveInput" class="text-sm text-pink-600 dark:text-pink-400 group-hover:text-pink-700 dark:group-hover:text-pink-300 transition-colors">保留输入</label>
         </div>
 
         <div class="flex items-center space-x-2 cursor-pointer group">
-          <input type="checkbox" id="removeDuplicates" class="rounded text-pink-500 border-pink-300 focus:ring-pink-500">
-          <label for="removeDuplicates" class="text-sm text-pink-600 group-hover:text-pink-700 transition-colors">去重</label>
+          <input type="checkbox" id="removeDuplicates" class="rounded text-pink-500 border-pink-300 dark:border-gray-600 focus:ring-pink-500">
+          <label for="removeDuplicates" class="text-sm text-pink-600 dark:text-pink-400 group-hover:text-pink-700 dark:group-hover:text-pink-300 transition-colors">去重</label>
         </div>
 
         <div class="flex items-center space-x-2 cursor-pointer group">
-          <input type="checkbox" id="searchNonUrls" class="rounded text-pink-500 border-pink-300 focus:ring-pink-500">
-          <label for="searchNonUrls" class="text-sm text-pink-600 group-hover:text-pink-700 transition-colors">搜索非URL</label>
+          <input type="checkbox" id="searchNonUrls" class="rounded text-pink-500 border-pink-300 dark:border-gray-600 focus:ring-pink-500">
+          <label for="searchNonUrls" class="text-sm text-pink-600 dark:text-pink-400 group-hover:text-pink-700 dark:group-hover:text-pink-300 transition-colors">搜索非URL</label>
         </div>
 
         <div class="flex items-center space-x-2 cursor-pointer group">
-          <input type="checkbox" id="validateUrls" class="rounded text-pink-500 border-pink-300 focus:ring-pink-500">
-          <label for="validateUrls" class="text-sm text-pink-600 group-hover:text-pink-700 transition-colors">验证URL</label>
+          <input type="checkbox" id="validateUrls" class="rounded text-pink-500 border-pink-300 dark:border-gray-600 focus:ring-pink-500">
+          <label for="validateUrls" class="text-sm text-pink-600 dark:text-pink-400 group-hover:text-pink-700 dark:group-hover:text-pink-300 transition-colors">验证URL</label>
         </div>
 
         <div class="flex items-center space-x-2 cursor-pointer group">
-          <input type="checkbox" id="autoProtocol" class="rounded text-pink-500 border-pink-300 focus:ring-pink-500">
-          <label for="autoProtocol" class="text-sm text-pink-600 group-hover:text-pink-700 transition-colors">自动https</label>
+          <input type="checkbox" id="autoProtocol" class="rounded text-pink-500 border-pink-300 dark:border-gray-600 focus:ring-pink-500">
+          <label for="autoProtocol" class="text-sm text-pink-600 dark:text-pink-400 group-hover:text-pink-700 dark:group-hover:text-pink-300 transition-colors">自动https</label>
         </div>
 
         <div class="flex items-center justify-between col-span-2">
-          <label class="text-sm font-medium text-pink-700">打开顺序</label>
-          <select id="openOrder" class="rounded-lg border border-pink-200 py-1.5 px-3 text-sm text-pink-600 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 bg-white">
+          <label class="text-sm font-medium text-pink-700 dark:text-pink-400">打开顺序</label>
+          <select id="openOrder" class="rounded-lg border border-pink-200 dark:border-gray-600 py-1.5 px-3 text-sm text-pink-600 dark:text-pink-400 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 bg-white dark:bg-gray-800">
             <option value="normal">正常顺序</option>
             <option value="reverse">反向顺序</option>
             <option value="random">随机顺序</option>
@@ -88,8 +104,8 @@ https://example.org"></textarea>
         </div>
 
         <div class="flex items-center justify-between col-span-2">
-          <label class="text-sm font-medium text-pink-700">标签页分组</label>
-          <select id="groupOption" class="rounded-lg border border-pink-200 py-1.5 px-3 text-sm text-pink-600 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 bg-white">
+          <label class="text-sm font-medium text-pink-700 dark:text-pink-400">标签页分组</label>
+          <select id="groupOption" class="rounded-lg border border-pink-200 dark:border-gray-600 py-1.5 px-3 text-sm text-pink-600 dark:text-pink-400 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 bg-white dark:bg-gray-800">
             <option value="none">不分组</option>
             <option value="new">新建分组</option>
             <option value="existing">现有分组</option>
@@ -97,8 +113,8 @@ https://example.org"></textarea>
         </div>
 
         <div class="flex items-center justify-between col-span-2">
-          <label class="text-sm font-medium text-pink-700">URL分类</label>
-          <select id="urlCategory" class="rounded-lg border border-pink-200 py-1.5 px-3 text-sm text-pink-600 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 bg-white">
+          <label class="text-sm font-medium text-pink-700 dark:text-pink-400">URL分类</label>
+          <select id="urlCategory" class="rounded-lg border border-pink-200 dark:border-gray-600 py-1.5 px-3 text-sm text-pink-600 dark:text-pink-400 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 bg-white dark:bg-gray-800">
             <option value="none">不分类</option>
             <option value="domain">按域名</option>
             <option value="custom">自定义</option>
@@ -106,38 +122,38 @@ https://example.org"></textarea>
         </div>
 
         <div class="flex items-center justify-between col-span-2">
-          <label class="text-sm font-medium text-pink-700">最大URL数量</label>
-          <input type="number" id="maxUrls" min="1" max="100" value="20" class="w-24 rounded-lg border border-pink-200 py-1.5 px-3 text-sm text-pink-600 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 bg-white">
+          <label class="text-sm font-medium text-pink-700 dark:text-pink-400">最大URL数量</label>
+          <input type="number" id="maxUrls" min="1" max="100" value="20" class="w-24 rounded-lg border border-pink-200 dark:border-gray-600 py-1.5 px-3 text-sm text-pink-600 dark:text-pink-400 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 bg-white dark:bg-gray-800">
         </div>
       </div>
     </div>
 
     <!-- 进度条 -->
     <div id="progressContainer" class="hidden">
-      <div class="w-full bg-pink-100 rounded-full h-2">
+      <div class="w-full bg-pink-100 dark:bg-gray-700 rounded-full h-2">
         <div id="progressBar" class="bg-gradient-to-r from-pink-500 to-pink-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
       </div>
-      <div class="text-sm text-pink-600 text-center mt-2">
+      <div class="text-sm text-pink-600 dark:text-pink-400 text-center mt-2">
         <span id="progressText">0/0</span>
       </div>
     </div>
 
     <!-- 状态信息 -->
-    <div id="status" class="text-sm text-pink-600 hidden text-center"></div>
+    <div id="status" class="text-sm text-pink-600 dark:text-pink-400 hidden text-center"></div>
 
     <!-- URL预览模态框 -->
     <div id="urlPreviewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
-      <div class="bg-white rounded-xl p-6 max-w-lg w-full mx-4 shadow-xl">
-        <h3 class="text-xl font-semibold text-pink-700 mb-4">URL预览</h3>
+      <div class="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-lg w-full mx-4 shadow-xl">
+        <h3 class="text-xl font-semibold text-pink-700 dark:text-pink-400 mb-4">URL预览</h3>
         <div id="urlPreviewList" class="max-h-96 overflow-y-auto space-y-2 pr-2"></div>
         <div class="mt-6 flex justify-end space-x-3">
-          <button id="closePreview" class="px-4 py-2 text-sm text-pink-600 hover:text-pink-700 transition-colors">关闭</button>
+          <button id="closePreview" class="px-4 py-2 text-sm text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 transition-colors">关闭</button>
           <button id="confirmOpen" class="px-4 py-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-lg hover:from-pink-600 hover:to-pink-700 text-sm transition-all shadow-sm hover:shadow-md">确认打开</button>
         </div>
       </div>
     </div>
   </div>
 
-  <script src="popup.js"></script>
+  <script src="popup.js" type="module"></script>
 </body>
 </html>
