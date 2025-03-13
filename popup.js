@@ -46,7 +46,76 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 更新界面文本
   const updateUIText = () => {
+    const elements = {
+      title: document.querySelector('h1'),
+      urlInputLabel: document.querySelector('label[for="urlInput"]'),
+      delayLoadLabel: document.querySelector('label[for="delayLoad"]'),
+      preserveInputLabel: document.querySelector('label[for="preserveInput"]'),
+      removeDuplicatesLabel: document.querySelector('label[for="removeDuplicates"]'),
+      searchNonUrlsLabel: document.querySelector('label[for="searchNonUrls"]'),
+      validateUrlsLabel: document.querySelector('label[for="validateUrls"]'),
+      autoProtocolLabel: document.querySelector('label[for="autoProtocol"]'),
+      openOrderLabel: document.querySelector('label[for="openOrder"]'),
+      groupOptionLabel: document.querySelector('label[for="groupOption"]'),
+      urlCategoryLabel: document.querySelector('label[for="urlCategory"]'),
+      maxUrlsLabel: document.querySelector('label[for="maxUrls"]'),
+      previewTitle: document.querySelector('#urlPreviewModal h3')
+    };
+
+    // 更新标题
     document.title = i18n.t('title');
+    if (elements.title) elements.title.textContent = i18n.t('title');
+    
+    // 更新按钮文本
+    if (importUrlsButton) importUrlsButton.textContent = i18n.t('import');
+    if (exportUrlsButton) exportUrlsButton.textContent = i18n.t('export');
+    if (openUrlsButton) openUrlsButton.textContent = i18n.t('openUrls');
+    if (extractUrlsButton) extractUrlsButton.textContent = i18n.t('extractUrls');
+    
+    // 更新标签文本
+    if (elements.urlInputLabel) elements.urlInputLabel.textContent = i18n.t('urlInputLabel');
+    if (elements.delayLoadLabel) elements.delayLoadLabel.textContent = i18n.t('delayLoad');
+    if (elements.preserveInputLabel) elements.preserveInputLabel.textContent = i18n.t('preserveInput');
+    if (elements.removeDuplicatesLabel) elements.removeDuplicatesLabel.textContent = i18n.t('removeDuplicates');
+    if (elements.searchNonUrlsLabel) elements.searchNonUrlsLabel.textContent = i18n.t('searchNonUrls');
+    if (elements.validateUrlsLabel) elements.validateUrlsLabel.textContent = i18n.t('validateUrls');
+    if (elements.autoProtocolLabel) elements.autoProtocolLabel.textContent = i18n.t('autoProtocol');
+    if (elements.openOrderLabel) elements.openOrderLabel.textContent = i18n.t('openOrder');
+    if (elements.groupOptionLabel) elements.groupOptionLabel.textContent = i18n.t('groupOption');
+    if (elements.urlCategoryLabel) elements.urlCategoryLabel.textContent = i18n.t('urlCategory');
+    if (elements.maxUrlsLabel) elements.maxUrlsLabel.textContent = i18n.t('maxUrls');
+    if (elements.previewTitle) elements.previewTitle.textContent = i18n.t('urlPreview');
+    
+    // 更新按钮文本
+    if (closePreview) closePreview.textContent = i18n.t('close');
+    if (confirmOpen) confirmOpen.textContent = i18n.t('confirmOpen');
+
+    // 更新选项文本
+    if (openOrder) {
+      openOrder.innerHTML = `
+        <option value="normal">${i18n.t('openOrderNormal')}</option>
+        <option value="reverse">${i18n.t('openOrderReverse')}</option>
+        <option value="random">${i18n.t('openOrderRandom')}</option>
+      `;
+    }
+
+    if (groupOption) {
+      groupOption.innerHTML = `
+        <option value="none">${i18n.t('groupOptionNone')}</option>
+        <option value="new">${i18n.t('groupOptionNew')}</option>
+        <option value="existing">${i18n.t('groupOptionExisting')}</option>
+      `;
+    }
+
+    if (urlCategory) {
+      urlCategory.innerHTML = `
+        <option value="none">${i18n.t('urlCategoryNone')}</option>
+        <option value="domain">${i18n.t('urlCategoryDomain')}</option>
+        <option value="custom">${i18n.t('urlCategoryCustom')}</option>
+      `;
+    }
+
+    // 更新占位符文本
     document.querySelector('h1').textContent = i18n.t('title');
     document.querySelector('label[for="urlInput"]').textContent = i18n.t('urlInputLabel');
     importUrlsButton.textContent = i18n.t('import');
@@ -198,11 +267,23 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   // 更新URL计数
-  const updateUrlCount = () => {
-    const urls = urlInput.value.split('\n').filter(url => url.trim() !== '');
-    const validUrls = urls.filter(url => urlProcessor.preprocessUrl(url, autoProtocol.checked) !== null);
-    urlCount.textContent = i18n.t('urlCount', { count: urls.length });
-    validUrlCount.textContent = i18n.t('validUrlCount', { count: validUrls.length });
+  const updateUrlCount = async () => {
+    try {
+      const urls = urlInput.value.split('\n').filter(url => url.trim() !== '');
+      const processedUrls = await urlProcessor.process(urls, {
+        validate: false,
+        removeDuplicates: false,
+        autoProtocol: autoProtocol.checked,
+        maxUrls: parseInt(maxUrls.value)
+      });
+      
+      urlCount.textContent = i18n.t('urlCount', { count: urls.length });
+      validUrlCount.textContent = i18n.t('validUrlCount', { count: processedUrls.length });
+    } catch (error) {
+      console.error('更新URL计数失败:', error);
+      urlCount.textContent = i18n.t('urlCount', { count: 0 });
+      validUrlCount.textContent = i18n.t('validUrlCount', { count: 0 });
+    }
   };
 
   // 显示URL预览
@@ -410,44 +491,29 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
       const urls = urlInput.value.split('\n').filter(url => url.trim() !== '');
       if (urls.length === 0) {
-        throw new Error(i18n.t('noUrlsToExport'));
+        statusDiv.textContent = i18n.t('noUrlsToExport');
+        statusDiv.classList.remove('hidden', 'text-green-600');
+        statusDiv.classList.add('text-yellow-600');
+        return;
       }
 
-      const format = 'json'; // 可以根据需要支持其他格式
-      let content, type, filename;
-
-      switch (format) {
-        case 'json':
-          content = JSON.stringify({ urls }, null, 2);
-          type = 'application/json';
-          filename = 'urls.json';
-          break;
-        case 'csv':
-          content = urls.map(url => `${url},`).join('\n');
-          type = 'text/csv';
-          filename = 'urls.csv';
-          break;
-        default:
-          content = urls.join('\n');
-          type = 'text/plain';
-          filename = 'urls.txt';
-      }
-
-      const blob = new Blob([content], { type });
+      const format = 'json';
+      const content = JSON.stringify({ urls }, null, 2);
+      const blob = new Blob([content], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = filename;
+      a.download = 'urls.json';
       a.click();
       URL.revokeObjectURL(url);
 
       statusDiv.textContent = i18n.t('exportSuccess');
-      statusDiv.classList.remove('hidden', 'text-red-600');
+      statusDiv.classList.remove('hidden', 'text-red-600', 'text-yellow-600');
       statusDiv.classList.add('text-green-600');
     } catch (error) {
       console.error('导出URL失败:', error);
       statusDiv.textContent = i18n.t('exportError', { message: error.message });
-      statusDiv.classList.remove('hidden', 'text-green-600');
+      statusDiv.classList.remove('hidden', 'text-green-600', 'text-yellow-600');
       statusDiv.classList.add('text-red-600');
     }
   };
@@ -523,15 +589,28 @@ document.addEventListener('DOMContentLoaded', function() {
     urlPreviewModal.classList.remove('flex');
   });
 
-  extractUrlsButton.addEventListener('click', () => {
+  extractUrlsButton.addEventListener('click', async () => {
     try {
+      statusDiv.textContent = i18n.t('processing');
+      statusDiv.classList.remove('hidden');
+
       const text = urlInput.value;
-      const urls = urlProcessor.process(text.split('\n'));
-      urlInput.value = urls.join('\n');
-      updateUrlCount();
-      statusDiv.textContent = i18n.t('success', { count: urls.length });
-      statusDiv.classList.remove('hidden', 'text-red-600');
-      statusDiv.classList.add('text-green-600');
+      const urls = await urlProcessor.process(text.split('\n'), {
+        validate: validateUrls.checked,
+        removeDuplicates: removeDuplicates.checked,
+        autoProtocol: autoProtocol.checked,
+        maxUrls: parseInt(maxUrls.value)
+      });
+      
+      if (Array.isArray(urls) && urls.length > 0) {
+        urlInput.value = urls.join('\n');
+        await updateUrlCount();
+        statusDiv.textContent = i18n.t('success', { count: urls.length });
+        statusDiv.classList.remove('hidden', 'text-red-600');
+        statusDiv.classList.add('text-green-600');
+      } else {
+        throw new Error(i18n.t('noValidUrls'));
+      }
     } catch (error) {
       console.error('提取URL失败:', error);
       statusDiv.textContent = i18n.t('error', { message: error.message });
