@@ -1,3 +1,38 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 自定义样式 */
+@layer components {
+  .btn-primary {
+    @apply flex-1 py-2.5 px-4 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-lg hover:from-pink-600 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition-all shadow-sm hover:shadow-md;
+  }
+
+  .btn-secondary {
+    @apply flex-1 py-2.5 px-4 border-2 border-pink-300 bg-white text-pink-600 rounded-lg hover:bg-pink-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition-all shadow-sm hover:shadow-md;
+  }
+
+  .input-textarea {
+    @apply w-full h-40 p-3 border border-pink-200 rounded-lg shadow-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500 bg-white text-sm;
+  }
+
+  .select-input {
+    @apply rounded-lg border border-pink-200 py-1.5 px-3 text-sm text-pink-600 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 bg-white;
+  }
+
+  .number-input {
+    @apply w-24 rounded-lg border border-pink-200 py-1.5 px-3 text-sm text-pink-600 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 bg-white;
+  }
+
+  .checkbox-label {
+    @apply text-sm text-pink-600 group-hover:text-pink-700 transition-colors;
+  }
+
+  .modal-content {
+    @apply bg-white rounded-xl p-6 max-w-lg w-full mx-4 shadow-xl;
+  }
+
+  .progress-bar {
+    @apply bg-gradient-to-r from-pink-500 to-pink-600 h-2 rounded-full transition-all duration-300;
+  }
+}

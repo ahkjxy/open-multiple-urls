@@ -18,7 +18,8 @@
   },
   "permissions": [
     "tabs",
-    "tabGroups"
+    "tabGroups",
+    "storage"
   ],
   "author": "ahkjxy",
   "homepage_url": "https://github.com/ahkjxy/open-multiple-urls"
