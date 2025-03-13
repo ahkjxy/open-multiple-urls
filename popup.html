@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Open Multiple URLs</title>
+  <link href="./dist/output.css" rel="stylesheet">
+</head>
+<body class="w-[500px] p-4 bg-pink-50">
+  <div class="space-y-4">
+    <!-- 标题 -->
+    <h1 class="text-xl font-bold text-pink-700 text-center">批量打开URL</h1>
+    
+    <!-- URL输入区域 -->
+    <div class="space-y-2">
+      <label class="block text-sm font-medium text-pink-600">输入URL列表（每行一个）</label>
+      <textarea
+        id="urlInput"
+        class="w-full h-40 p-2 border border-pink-200 rounded-lg shadow-sm focus:ring-pink-500 focus:border-pink-500 bg-white"
+        placeholder="https://example.com
+https://example.org"></textarea>
+    </div>
+
+    <!-- 选项设置 -->
+    <div class="bg-white p-4 rounded-lg shadow-sm border border-pink-100">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="flex items-center space-x-2">
+          <input type="checkbox" id="delayLoad" class="rounded text-pink-500 border-pink-300">
+          <label class="text-sm text-pink-600">不加载标签页直到选中</label>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <input type="checkbox" id="preserveInput" class="rounded text-pink-500 border-pink-300">
+          <label class="text-sm text-pink-600">保留输入</label>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <input type="checkbox" id="removeDuplicates" class="rounded text-pink-500 border-pink-300">
+          <label class="text-sm text-pink-600">忽略重复URL</label>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <input type="checkbox" id="searchNonUrls" class="rounded text-pink-500 border-pink-300">
+          <label class="text-sm text-pink-600">将非URL作为搜索查询处理</label>
+        </div>
+
+        <div class="flex items-center justify-between col-span-2">
+          <label class="text-sm font-medium text-pink-600">打开顺序</label>
+          <select id="openOrder" class="rounded-md border border-pink-200 py-1 px-2 text-sm text-pink-600 focus:ring-pink-500 focus:border-pink-500">
+            <option value="normal">正常顺序</option>
+            <option value="reverse">反向顺序</option>
+            <option value="random">随机顺序</option>
+          </select>
+        </div>
+
+        <div class="flex items-center justify-between col-span-2">
+          <label class="text-sm font-medium text-pink-600">标签页分组</label>
+          <select id="groupOption" class="rounded-md border border-pink-200 py-1 px-2 text-sm text-pink-600 focus:ring-pink-500 focus:border-pink-500">
+            <option value="none">不分组</option>
+            <option value="new">创建新分组</option>
+            <option value="existing">添加到现有分组</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="space-y-2">
+      <button
+        id="openUrls"
+        class="w-full py-2 px-4 bg-pink-500 text-white rounded-lg hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition-colors shadow-sm">
+        打开URL
+      </button>
+      <button
+        id="extractUrls"
+        class="w-full py-2 px-4 border border-pink-300 bg-white text-pink-600 rounded-lg hover:bg-pink-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition-colors shadow-sm">
+        从文本提取URL
+      </button>
+    </div>
+
+    <!-- 状态信息 -->
+    <div id="status" class="text-sm text-pink-600 hidden"></div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
