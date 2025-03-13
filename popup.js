@@ -603,6 +603,7 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       
       if (Array.isArray(urls) && urls.length > 0) {
+        // 更新输入框内容为提取的 URL
         urlInput.value = urls.join('\n');
         await updateUrlCount();
         statusDiv.textContent = i18n.t('success', { count: urls.length });

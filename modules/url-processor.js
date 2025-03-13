@@ -39,18 +39,24 @@ export class URLProcessor {
       url = url.trim();
       if (!url) return null;
 
-      // 提取 URL 部分
-      const urlMatch = url.match(/(?:https?:\/\/)?[\w-]+(?:\.[\w-]+)+(?:[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/i);
+      // 提取 URL 部分，支持更多格式
+      const urlMatch = url.match(/(?:https?:\/\/)?(?:www\.)?[\w-]+(?:\.[\w-]+)+(?::\d+)?(?:\/[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/i);
       if (!urlMatch) return null;
 
       url = urlMatch[0];
 
       // 添加协议
       if (autoProtocol && !url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
+        url = 'http://' + url;
       }
 
-      return url;
+      // 验证 URL 格式
+      try {
+        new URL(url);
+        return url;
+      } catch {
+        return null;
+      }
     } catch (error) {
       console.error('URL 预处理失败:', error);
       return null;
