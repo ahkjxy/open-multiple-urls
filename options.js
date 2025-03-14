@@ -113,9 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function showStatus(message, type = 'success') {
     const statusContainer = document.getElementById('statusContainer');
     const statusDiv = document.createElement('div');
-    statusDiv.className = `px-4 py-2 rounded-lg text-white transition-all duration-300 transform translate-y-0 opacity-100 mb-2 bg-gradient-to-r ${
-      type === 'success' ? 'from-green-500/90 to-green-600/90' : 'from-red-500/90 to-red-600/90'
-    } backdrop-blur-sm shadow-lg`;
+    statusDiv.className = `fixed top-4 left-1/2 -translate-x-1/2 px-6 py-3 rounded-lg text-white transition-all duration-300 transform translate-y-0 opacity-100 bg-gradient-to-r ${type === 'success' ? 'from-green-500/95 to-green-600/95' : 'from-red-500/95 to-red-600/95'} backdrop-blur-sm shadow-xl z-50`;
     statusDiv.textContent = message;
     
     // 添加到容器
@@ -124,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 淡出动画
     setTimeout(() => {
       statusDiv.style.opacity = '0';
-      statusDiv.style.transform = 'translateY(100%)';
+      statusDiv.style.transform = 'translateY(-100%)';
       setTimeout(() => statusDiv.remove(), 300);
     }, 3000);
   }

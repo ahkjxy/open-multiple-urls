@@ -48,11 +48,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 显示状态信息
   const showStatus = (message, type = 'success') => {
+    const statusContainer = document.getElementById('statusContainer');
+    const statusDiv = document.createElement('div');
+    statusDiv.className = `fixed top-4 left-1/2 -translate-x-1/2 px-6 py-3 rounded-lg text-white transition-all duration-300 transform translate-y-0 opacity-100 bg-gradient-to-r ${type === 'success' ? 'from-green-500/95 to-green-600/95' : 'from-red-500/95 to-red-600/95'} backdrop-blur-sm shadow-xl z-50`;
     statusDiv.textContent = message;
-    statusDiv.className = `text-lg font-medium ${type === 'success' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`;
-    statusModal.classList.remove('hidden');
-    statusModal.classList.add('flex');
+    
+    // 添加到容器
+    statusContainer.appendChild(statusDiv);
+
+    // 淡出动画
+    setTimeout(() => {
+      statusDiv.style.opacity = '0';
+      statusDiv.style.transform = 'translateY(-100%)';
+      setTimeout(() => statusDiv.remove(), 300);
+    }, 3000);
   };
+
+  // 移除不再需要的状态模态框相关代码
+  // const hideStatus = () => {
+  //   statusModal.classList.remove('flex');
+  //   statusModal.classList.add('hidden');
+  // };
+  
+  // closeStatus.addEventListener('click', hideStatus);
 
   // 隐藏状态信息
   const hideStatus = () => {
@@ -302,6 +320,24 @@ document.addEventListener('DOMContentLoaded', function() {
       statusDiv.classList.remove('hidden', 'text-green-600');
       statusDiv.classList.add('text-red-600');
     }
+  };
+
+  // 统一的错误处理函数
+  const handleError = async (error, operation, retryCount = 3) => {
+    console.error(`[URL Opener v1.4.0] ${operation} 失败:`, error);
+    
+    if (retryCount > 0) {
+      try {
+        showStatus(i18n.t('retrying', { count: 4 - retryCount }), 'info');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return true; // 允许重试
+      } catch (retryError) {
+        return handleError(retryError, operation, retryCount - 1);
+      }
+    }
+    
+    showStatus(i18n.t('error', { message: error.message }), 'error');
+    return false; // 不再重试
   };
 
   // 打开URL
