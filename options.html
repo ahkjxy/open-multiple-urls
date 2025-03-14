@@ -1,268 +1,142 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html class="dark:bg-gray-800">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>批量打开URL - 设置</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        pink: {
-                            50: '#fdf2f8',
-                            100: '#fce7f3',
-                            200: '#fbcfe8',
-                            300: '#f9a8d4',
-                            400: '#f472b6',
-                            500: '#ec4899',
-                            600: '#db2777',
-                            700: '#be185d',
-                            800: '#9d174d',
-                            900: '#831843',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <title data-i18n="settings">设置</title>
+    <link href="./dist/output.css" rel="stylesheet">
     <style>
-        body {
-            background: linear-gradient(135deg, #fdf2f8 0%, #ffffff 100%);
-            min-height: 100vh;
-            padding: 2rem;
+        .section-content:not(.active) {
+            display: none;
         }
-        .dark body {
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        .nav-item.active {
+            background-color: rgb(243 244 246);
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-        .dark .container {
-            background: #1f2937;
-        }
-        .section {
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        .dark .section {
-            border-bottom-color: #374151;
-        }
-        .section:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        .section-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #db2777;
-            margin-bottom: 1rem;
-        }
-        .dark .section-title {
-            color: #f472b6;
-        }
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        .form-label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #4b5563;
-            margin-bottom: 0.5rem;
-        }
-        .dark .form-label {
-            color: #9ca3af;
-        }
-        .form-input {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            color: #1f2937;
-            background-color: white;
-        }
-        .dark .form-input {
-            background-color: #374151;
-            border-color: #4b5563;
-            color: #f3f4f6;
-        }
-        .form-input:focus {
-            outline: none;
-            border-color: #db2777;
-            box-shadow: 0 0 0 2px rgba(219, 39, 119, 0.1);
-        }
-        .dark .form-input:focus {
-            border-color: #f472b6;
-            box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.1);
-        }
-        .form-select {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            color: #1f2937;
-            background-color: white;
-        }
-        .dark .form-select {
-            background-color: #374151;
-            border-color: #4b5563;
-            color: #f3f4f6;
-        }
-        .form-select:focus {
-            outline: none;
-            border-color: #db2777;
-            box-shadow: 0 0 0 2px rgba(219, 39, 119, 0.1);
-        }
-        .dark .form-select:focus {
-            border-color: #f472b6;
-            box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.1);
-        }
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-        .checkbox-input {
-            margin-right: 0.5rem;
-            color: #db2777;
-        }
-        .dark .checkbox-input {
-            color: #f472b6;
-        }
-        .checkbox-label {
-            font-size: 0.875rem;
-            color: #4b5563;
-        }
-        .dark .checkbox-label {
-            color: #9ca3af;
-        }
-        .button {
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .button-primary {
-            background: linear-gradient(135deg, #db2777 0%, #ec4899 100%);
-            color: white;
-            border: none;
-        }
-        .button-primary:hover {
-            opacity: 0.9;
-        }
-        .button-secondary {
-            background: white;
-            color: #db2777;
-            border: 1px solid #db2777;
-        }
-        .dark .button-secondary {
-            background: #374151;
-            color: #f472b6;
-            border-color: #f472b6;
-        }
-        .button-secondary:hover {
-            background: #fdf2f8;
-        }
-        .dark .button-secondary:hover {
-            background: #374151;
-        }
-        .status {
-            margin-top: 1rem;
-            padding: 0.5rem;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-        }
-        .status-success {
-            background-color: #dcfce7;
-            color: #166534;
-        }
-        .dark .status-success {
-            background-color: #064e3b;
-            color: #6ee7b7;
-        }
-        .status-error {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-        .dark .status-error {
-            background-color: #7f1d1d;
-            color: #fecaca;
+        .dark .nav-item.active {
+            background-color: rgb(55 65 81);
         }
     </style>
+    <script>
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
 </head>
-<body class="bg-gradient-to-br from-pink-50 to-white dark:from-gray-900 dark:to-gray-800 min-h-screen text-gray-900 dark:text-gray-100">
-    <div class="container mx-auto px-4 py-8">
-        <div class="max-w-4xl mx-auto">
-            <h1 class="text-3xl font-bold text-pink-600 dark:text-pink-400 mb-8" id="title"></h1>
-            
-            <!-- 语言设置 -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-                <h2 class="text-xl font-semibold text-pink-600 dark:text-pink-400 mb-4" id="language"></h2>
-                <div class="flex items-center space-x-4">
-                    <select id="languageSelect" class="form-select">
-                        <option value="zh">中文</option>
-                        <option value="en">English</option>
-                    </select>
-                </div>
-            </div>
+<body class="bg-gray-100 dark:bg-gray-800 min-h-screen transition-colors duration-200">
+    <div class="container max-w-4xl mx-auto p-6 flex gap-6">
+        <!-- 左侧导航栏 -->
+        <div class="w-48 bg-white dark:bg-gray-700 rounded-lg p-4 shadow-md border border-gray-200 dark:border-gray-600 h-fit sticky top-6">
+            <h2 class="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4" data-i18n="settings">设置</h2>
+            <nav class="space-y-1">
+                <button data-section="general" class="w-full text-left px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors nav-item active font-medium" data-i18n="generalSettings">常规设置</button>
+                <button data-section="appearance" class="w-full text-left px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors nav-item font-medium" data-i18n="appearanceSettings">外观设置</button>
+                <button data-section="url" class="w-full text-left px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors nav-item font-medium" data-i18n="urlSettings">URL设置</button>
+                <button data-section="advanced" class="w-full text-left px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors nav-item font-medium" data-i18n="advancedSettings">高级设置</button>
+                <button data-section="about" class="w-full text-left px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors nav-item font-medium" data-i18n="about">关于</button>
+            </nav>
+        </div>
 
-            <!-- 主题设置 -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-                <h2 class="text-xl font-semibold text-pink-600 dark:text-pink-400 mb-4" id="theme"></h2>
-                <div class="flex items-center space-x-4">
-                    <button id="themeToggle" class="p-2 rounded-full hover:bg-pink-100 dark:hover:bg-gray-700">
-                        <svg id="sunIcon" class="w-6 h-6 text-pink-600 dark:text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                        </svg>
-                        <svg id="moonIcon" class="w-6 h-6 text-pink-600 dark:text-pink-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-                        </svg>
-                    </button>
+        <!-- 右侧内容区 -->
+        <div class="flex-1 space-y-4">
+            <!-- 常规设置 -->
+            <section id="general" class="section-content active bg-white dark:bg-gray-700 rounded-lg p-5 shadow-md border border-gray-200 dark:border-gray-600">
+                <h3 class="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4" data-i18n="generalSettings">常规设置</h3>
+                <div class="space-y-4">
+                    <!-- 语言设置 -->
+                    <div class="flex items-center justify-between">
+                        <label class="text-sm font-medium text-gray-600 dark:text-gray-300 w-1/2" data-i18n="language">语言</label>
+                        <select id="languageSelect" class="w-32 rounded-lg border border-gray-200 dark:border-gray-600 py-1.5 px-3 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500">
+                            <option value="zh" data-i18n="languageZh">中文</option>
+                            <option value="en" data-i18n="languageEn">English</option>
+                        </select>
+                    </div>
+                    <!-- 主题设置 -->
+                    <div class="flex items-center justify-between">
+                        <label class="text-sm font-medium text-gray-600 dark:text-gray-300 w-1/2" data-i18n="theme">主题</label>
+                        <select id="themeSelect" class="w-32 rounded-lg border border-gray-200 dark:border-gray-600 py-1.5 px-3 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500">
+                            <option value="light" data-i18n="themeLight">浅色</option>
+                            <option value="dark" data-i18n="themeDark">深色</option>
+                            <option value="system" data-i18n="themeSystem">跟随系统</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
+            </section>
+
+            <!-- 外观设置 -->
+            <section id="appearance" class="section-content bg-white dark:bg-gray-700 rounded-lg p-5 shadow-md border border-gray-200 dark:border-gray-600">
+                <h3 class="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4" data-i18n="appearanceSettings">外观设置</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="showUrlCount" class="rounded text-indigo-600 border-gray-300 dark:border-gray-600 focus:ring-indigo-500/50">
+                        <label for="showUrlCount" class="text-sm text-gray-600 dark:text-gray-300" data-i18n="showUrlCount">显示URL计数</label>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="showProgressBar" class="rounded text-indigo-600 border-gray-300 dark:border-gray-600 focus:ring-indigo-500/50">
+                        <label for="showProgressBar" class="text-sm text-gray-600 dark:text-gray-300" data-i18n="showProgressBar">显示进度条</label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- URL设置 -->
+            <section id="url" class="section-content bg-white dark:bg-gray-700 rounded-lg p-5 shadow-md border border-gray-200 dark:border-gray-600">
+                <h3 class="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4" data-i18n="urlSettings">URL设置</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <label class="text-sm font-medium text-gray-600 dark:text-gray-300 w-1/2" data-i18n="defaultMaxUrls">默认最大URL数量</label>
+                        <input type="number" id="defaultMaxUrls" min="1" max="100" value="20" class="w-32 rounded-lg border border-gray-200 dark:border-gray-600 py-1.5 px-3 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500">
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="defaultValidateUrls" class="rounded text-indigo-600 border-gray-300 dark:border-gray-600 focus:ring-indigo-500/50">
+                        <label for="defaultValidateUrls" class="text-sm text-gray-600 dark:text-gray-300" data-i18n="defaultValidateUrls">默认验证URL</label>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="defaultAutoProtocol" class="rounded text-indigo-600 border-gray-300 dark:border-gray-600 focus:ring-indigo-500/50">
+                        <label for="defaultAutoProtocol" class="text-sm text-gray-600 dark:text-gray-300" data-i18n="defaultAutoProtocol">默认自动添加协议</label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 高级设置 -->
+            <section id="advanced" class="section-content bg-white dark:bg-gray-700 rounded-lg p-5 shadow-md border border-gray-200 dark:border-gray-600">
+                <h3 class="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4" data-i18n="advancedSettings">高级设置</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <label class="text-sm font-medium text-gray-600 dark:text-gray-300 w-1/2" data-i18n="cacheExpiration">缓存过期时间（小时）</label>
+                        <input type="number" id="cacheExpiration" min="1" max="720" value="24" class="w-32 rounded-lg border border-gray-200 dark:border-gray-600 py-1.5 px-3 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500">
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="enableDebugMode" class="rounded text-indigo-600 border-gray-300 dark:border-gray-600 focus:ring-indigo-500/50">
+                        <label for="enableDebugMode" class="text-sm text-gray-600 dark:text-gray-300" data-i18n="enableDebugMode">启用调试模式</label>
+                    </div>
+                </div>
+            </section>
 
             <!-- 关于 -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                <h2 class="text-xl font-semibold text-pink-600 dark:text-pink-400 mb-4" id="about"></h2>
+            <section id="about" class="section-content bg-white dark:bg-gray-700 rounded-lg p-5 shadow-md border border-gray-200 dark:border-gray-600">
+                <h3 class="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4" data-i18n="about">关于</h3>
                 <div class="space-y-4">
-                    <p class="text-gray-600 dark:text-gray-300" id="version"></p>
-                    <p class="text-gray-600 dark:text-gray-300" id="description"></p>
-                    <h3 class="text-lg font-medium text-pink-600 dark:text-pink-400 mt-6" id="features"></h3>
-                    <ul class="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-300">
-                        <li id="feature1"></li>
-                        <li id="feature2"></li>
-                        <li id="feature3"></li>
-                        <li id="feature4"></li>
-                        <li id="feature5"></li>
-                        <li id="feature6"></li>
-                        <li id="feature7"></li>
-                        <li id="feature8"></li>
-                        <li id="feature9"></li>
-                        <li id="feature10"></li>
-                        <li id="feature11"></li>
-                        <li id="feature12"></li>
-                        <li id="feature13"></li>
-                        <li id="feature14"></li>
-                        <li id="feature15"></li>
-                    </ul>
+                    <div class="text-sm text-gray-600 dark:text-gray-300">
+                        <p class="mb-2"><span data-i18n="version">版本</span>: <span id="versionNumber">1.4.0</span></p>
+                        <p class="mb-4" data-i18n="description">一个用于批量打开URL的Chrome扩展</p>
+                        <h4 class="font-medium mb-2" data-i18n="features">功能特点</h4>
+                        <ul class="list-disc list-inside space-y-1 ml-2">
+                            <li data-i18n="feature1">支持批量打开多个URL</li>
+                            <li data-i18n="feature2">支持URL提取和验证</li>
+                            <li data-i18n="feature3">支持标签页分组管理</li>
+                            <li data-i18n="feature4">支持多语言和主题切换</li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
+            </section>
         </div>
     </div>
-    <script type="module" src="options.js"></script>
+
+    <!-- 状态提示容器 -->
+    <div id="statusContainer" class="fixed bottom-4 right-4 z-50"></div>
+
+    <script src="modules/i18n.js" type="module"></script>
+    <script src="options.js" type="module"></script>
 </body>
-</html> 
+</html>

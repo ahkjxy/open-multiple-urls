@@ -3,6 +3,8 @@ module.exports = {
   content: [
     "./popup.html",
     "./popup.js",
+    "./options.html",
+    "./options.js",
     "./modules/**/*.js"
   ],
   darkMode: 'class',

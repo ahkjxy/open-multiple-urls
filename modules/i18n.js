@@ -16,6 +16,8 @@ export class I18n {
         openOrderNormal: '正常顺序',
         openOrderReverse: '反向顺序',
         openOrderRandom: '随机顺序',
+        openOrderDomain: '按域名排序',
+        openOrderTime: '按时间排序',
         groupOption: '标签页分组',
         groupOptionNone: '不分组',
         groupOptionNew: '新建分组',
@@ -84,6 +86,8 @@ export class I18n {
         openOrderNormal: 'Normal Order',
         openOrderReverse: 'Reverse Order',
         openOrderRandom: 'Random Order',
+        openOrderDomain: 'Sort by Domain',
+        openOrderTime: 'Sort by Time',
         groupOption: 'Tab Grouping',
         groupOptionNone: 'No Grouping',
         groupOptionNew: 'New Group',
@@ -183,4 +187,4 @@ export class I18n {
       console.error('Failed to load locale:', error);
     }
   }
-} 
+}

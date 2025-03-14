@@ -1,41 +1,29 @@
 document.addEventListener('DOMContentLoaded', function() {
   // 获取所有设置元素
   const elements = {
-    maxUrls: document.getElementById('maxUrls'),
-    openOrder: document.getElementById('openOrder'),
-    removeDuplicates: document.getElementById('removeDuplicates'),
-    validateUrls: document.getElementById('validateUrls'),
-    autoProtocol: document.getElementById('autoProtocol'),
-    groupOption: document.getElementById('groupOption'),
-    urlCategory: document.getElementById('urlCategory'),
-    checkSecurity: document.getElementById('checkSecurity'),
-    blacklist: document.getElementById('blacklist'),
-    whitelist: document.getElementById('whitelist'),
-    maxCacheSize: document.getElementById('maxCacheSize'),
-    cacheExpiry: document.getElementById('cacheExpiry'),
-    theme: document.getElementById('theme'),
-    language: document.getElementById('language'),
-    saveButton: document.getElementById('saveButton'),
-    resetButton: document.getElementById('resetButton'),
+    languageSelect: document.getElementById('languageSelect'),
+    themeSelect: document.getElementById('themeSelect'),
+    showUrlCount: document.getElementById('showUrlCount'),
+    showProgressBar: document.getElementById('showProgressBar'),
+    defaultMaxUrls: document.getElementById('defaultMaxUrls'),
+    defaultValidateUrls: document.getElementById('defaultValidateUrls'),
+    defaultAutoProtocol: document.getElementById('defaultAutoProtocol'),
+    cacheExpiration: document.getElementById('cacheExpiration'),
+    enableDebugMode: document.getElementById('enableDebugMode'),
     status: document.getElementById('status')
   };
 
   // 默认设置
   const defaultSettings = {
-    maxUrls: 20,
-    openOrder: 'normal',
-    removeDuplicates: true,
-    validateUrls: true,
-    autoProtocol: true,
-    groupOption: 'none',
-    urlCategory: 'none',
-    checkSecurity: true,
-    blacklist: '',
-    whitelist: '',
-    maxCacheSize: 1000,
-    cacheExpiry: 24,
-    theme: 'light',
-    language: 'zh-CN'
+    language: 'zh',
+    theme: 'system',
+    showUrlCount: true,
+    showProgressBar: true,
+    defaultMaxUrls: 20,
+    defaultValidateUrls: true,
+    defaultAutoProtocol: true,
+    cacheExpiration: 24,
+    enableDebugMode: false
   };
 
   // 加载设置
@@ -45,20 +33,15 @@ document.addEventListener('DOMContentLoaded', function() {
       const settings = result.settings || defaultSettings;
 
       // 更新表单元素
-      elements.maxUrls.value = settings.maxUrls;
-      elements.openOrder.value = settings.openOrder;
-      elements.removeDuplicates.checked = settings.removeDuplicates;
-      elements.validateUrls.checked = settings.validateUrls;
-      elements.autoProtocol.checked = settings.autoProtocol;
-      elements.groupOption.value = settings.groupOption;
-      elements.urlCategory.value = settings.urlCategory;
-      elements.checkSecurity.checked = settings.checkSecurity;
-      elements.blacklist.value = settings.blacklist;
-      elements.whitelist.value = settings.whitelist;
-      elements.maxCacheSize.value = settings.maxCacheSize;
-      elements.cacheExpiry.value = settings.cacheExpiry;
-      elements.theme.value = settings.theme;
-      elements.language.value = settings.language;
+      elements.languageSelect.value = settings.language;
+      elements.themeSelect.value = settings.theme;
+      elements.showUrlCount.checked = settings.showUrlCount;
+      elements.showProgressBar.checked = settings.showProgressBar;
+      elements.defaultMaxUrls.value = settings.defaultMaxUrls;
+      elements.defaultValidateUrls.checked = settings.defaultValidateUrls;
+      elements.defaultAutoProtocol.checked = settings.defaultAutoProtocol;
+      elements.cacheExpiration.value = settings.cacheExpiration;
+      elements.enableDebugMode.checked = settings.enableDebugMode;
 
       // 应用主题
       applyTheme(settings.theme);
@@ -72,23 +55,20 @@ document.addEventListener('DOMContentLoaded', function() {
   async function saveSettings() {
     try {
       const settings = {
-        maxUrls: parseInt(elements.maxUrls.value),
-        openOrder: elements.openOrder.value,
-        removeDuplicates: elements.removeDuplicates.checked,
-        validateUrls: elements.validateUrls.checked,
-        autoProtocol: elements.autoProtocol.checked,
-        groupOption: elements.groupOption.value,
-        urlCategory: elements.urlCategory.value,
-        checkSecurity: elements.checkSecurity.checked,
-        blacklist: elements.blacklist.value,
-        whitelist: elements.whitelist.value,
-        maxCacheSize: parseInt(elements.maxCacheSize.value),
-        cacheExpiry: parseInt(elements.cacheExpiry.value),
-        theme: elements.theme.value,
-        language: elements.language.value
+        language: elements.languageSelect.value,
+        theme: elements.themeSelect.value,
+        showUrlCount: elements.showUrlCount.checked,
+        showProgressBar: elements.showProgressBar.checked,
+        defaultMaxUrls: parseInt(elements.defaultMaxUrls.value),
+        defaultValidateUrls: elements.defaultValidateUrls.checked,
+        defaultAutoProtocol: elements.defaultAutoProtocol.checked,
+        cacheExpiration: parseInt(elements.cacheExpiration.value),
+        enableDebugMode: elements.enableDebugMode.checked
       };
 
+      console.log('[URL Opener v1.0.0] 正在保存设置:', settings);
       await chrome.storage.local.set({ settings });
+      console.log('[URL Opener v1.0.0] 设置保存成功');
       showStatus('设置已保存', 'success');
 
       // 应用主题
@@ -100,8 +80,9 @@ document.addEventListener('DOMContentLoaded', function() {
         data: settings
       });
     } catch (error) {
-      console.error('保存设置失败:', error);
+      console.error('[URL Opener v1.0.0] 保存设置失败:', error);
       showStatus('保存设置失败', 'error');
+      throw error;
     }
   }
 
@@ -119,37 +100,92 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 应用主题
   function applyTheme(theme) {
-    document.body.classList.remove('light-theme', 'dark-theme');
+    document.documentElement.classList.remove('light', 'dark');
     if (theme === 'system') {
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      document.body.classList.add(prefersDark ? 'dark-theme' : 'light-theme');
+      document.documentElement.classList.add(prefersDark ? 'dark' : 'light');
     } else {
-      document.body.classList.add(`${theme}-theme`);
+      document.documentElement.classList.add(theme);
     }
   }
 
   // 显示状态消息
-  function showStatus(message, type) {
-    elements.status.textContent = message;
-    elements.status.className = `status status-${type}`;
-    elements.status.classList.remove('hidden');
+  function showStatus(message, type = 'success') {
+    const statusContainer = document.getElementById('statusContainer');
+    const statusDiv = document.createElement('div');
+    statusDiv.className = `px-4 py-2 rounded-lg text-white transition-all duration-300 transform translate-y-0 opacity-100 mb-2 bg-gradient-to-r ${
+      type === 'success' ? 'from-green-500/90 to-green-600/90' : 'from-red-500/90 to-red-600/90'
+    } backdrop-blur-sm shadow-lg`;
+    statusDiv.textContent = message;
+    
+    // 添加到容器
+    statusContainer.appendChild(statusDiv);
 
+    // 淡出动画
     setTimeout(() => {
-      elements.status.classList.add('hidden');
+      statusDiv.style.opacity = '0';
+      statusDiv.style.transform = 'translateY(100%)';
+      setTimeout(() => statusDiv.remove(), 300);
     }, 3000);
   }
 
-  // 事件监听器
-  elements.saveButton.addEventListener('click', saveSettings);
-  elements.resetButton.addEventListener('click', resetSettings);
+  // 页面切换处理
+  const navItems = document.querySelectorAll('.nav-item');
+  const sections = document.querySelectorAll('.section-content');
+
+  function switchSection(targetSection) {
+    // 更新导航按钮状态
+    navItems.forEach(item => {
+      if (item.dataset.section === targetSection) {
+        item.classList.add('active');
+      } else {
+        item.classList.remove('active');
+      }
+    });
+
+    // 更新内容区域显示
+    sections.forEach(section => {
+      if (section.id === targetSection) {
+        section.classList.add('active');
+        section.style.display = 'block';
+      } else {
+        section.classList.remove('active');
+        section.style.display = 'none';
+      }
+    });
+  }
+
+  // 绑定事件监听器
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      switchSection(item.dataset.section);
+    });
+  });
+
+  // 监听主题变化
+  elements.themeSelect.addEventListener('change', () => {
+    applyTheme(elements.themeSelect.value);
+    saveSettings();
+  });
 
   // 监听系统主题变化
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-    if (elements.theme.value === 'system') {
+    if (elements.themeSelect.value === 'system') {
       applyTheme('system');
     }
   });
 
+  // 为所有设置添加变更监听器
+  elements.languageSelect.addEventListener('change', saveSettings);
+  elements.showUrlCount.addEventListener('change', saveSettings);
+  elements.showProgressBar.addEventListener('change', saveSettings);
+  elements.defaultMaxUrls.addEventListener('change', saveSettings);
+  elements.defaultValidateUrls.addEventListener('change', saveSettings);
+  elements.defaultAutoProtocol.addEventListener('change', saveSettings);
+  elements.cacheExpiration.addEventListener('change', saveSettings);
+  elements.enableDebugMode.addEventListener('change', saveSettings);
+
   // 初始化
   loadSettings();
-}); 
+  switchSection('general');
+});
