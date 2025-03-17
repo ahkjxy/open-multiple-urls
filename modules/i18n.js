@@ -69,7 +69,27 @@ export class I18n {
         feature11: '支持URL安全性检查',
         feature12: '支持URL元数据缓存',
         feature13: '支持自定义设置保存',
-        feature14: '支持URL计数统计'
+        feature14: '支持URL计数统计',
+        settingsSaved: '设置已保存',
+        maxUrlsLimitReached: 'URL数量超过限制，已截取前 {count} 个',
+        generalSettings: '常规设置',
+        appearanceSettings: '外观设置',
+        urlSettings: 'URL设置',
+        advancedSettings: '高级设置',
+        theme: '主题',
+        themeSystem: '跟随系统',
+        showUrlCount: '显示URL计数',
+        showProgressBar: '显示进度条',
+        defaultMaxUrls: '默认最大URL数量',
+        defaultValidateUrls: '默认验证URL',
+        defaultAutoProtocol: '默认自动添加协议',
+        cacheExpiration: '缓存过期时间（小时）',
+        enableDebugMode: '启用调试模式',
+        game2024: '2024 游戏',
+        score: '得分',
+        newGame: '新游戏',
+        gameInstructions: '使用方向键或滑动来移动方块。合并相同数字以达到2024！',
+        gameOver: '游戏结束！最终得分：'
       },
       en: {
         title: 'Open Multiple URLs',
@@ -138,7 +158,26 @@ export class I18n {
         feature11: 'URL security checking',
         feature12: 'URL metadata caching',
         feature13: 'Custom settings saving',
-        feature14: 'URL counting statistics'
+        feature14: 'URL counting statistics',
+        settingsSaved: 'Settings saved',
+        generalSettings: 'General Settings',
+        appearanceSettings: 'Appearance Settings',
+        urlSettings: 'URL Settings',
+        advancedSettings: 'Advanced Settings',
+        theme: 'Theme',
+        themeSystem: 'System',
+        showUrlCount: 'Show URL Count',
+        showProgressBar: 'Show Progress Bar',
+        defaultMaxUrls: 'Default Max URLs',
+        defaultValidateUrls: 'Default Validate URLs',
+        defaultAutoProtocol: 'Default Auto Protocol',
+        cacheExpiration: 'Cache Expiration (Hours)',
+        enableDebugMode: 'Enable Debug Mode',
+        game2024: '2024 Game',
+        score: 'Score',
+        newGame: 'New Game',
+        gameInstructions: 'Use arrow keys or swipe to move tiles. Combine matching numbers to reach 2024!',
+        gameOver: 'Game Over! Final Score: '
       }
     };
   }
@@ -185,4 +224,10 @@ export class I18n {
       console.error('Failed to load locale:', error);
     }
   }
+}
+
+export function initializeI18n() {
+  const i18n = new I18n();
+  i18n.loadLocale();
+  return i18n;
 }

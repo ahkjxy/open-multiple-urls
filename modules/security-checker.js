@@ -1,3 +1,6 @@
+import { getVersion } from './version.js';
+import { logger } from './logger.js';
+
 export class SecurityChecker {
   constructor() {
     this.blacklist = new Set();
@@ -45,7 +48,7 @@ export class SecurityChecker {
 
       return { safe: true, reason: 'verified' };
     } catch (error) {
-      console.error('URL 安全检查失败:', error);
+      logger.error('URL 安全检查失败:', error);
       return { safe: false, reason: 'check_failed' };
     }
   }
@@ -73,7 +76,7 @@ export class SecurityChecker {
         body: JSON.stringify({
           client: {
             clientId: 'your-client-id',
-            clientVersion: '1.0.0'
+            clientVersion: '1.4.1'
           },
           threatInfo: {
             threatTypes: ['MALWARE', 'SOCIAL_ENGINEERING'],
@@ -90,7 +93,7 @@ export class SecurityChecker {
         reason: data.matches ? 'malicious_domain' : 'safe_domain'
       };
     } catch (error) {
-      console.error('域名信誉检查失败:', error);
+      logger.error('域名信誉检查失败:', error);
       return { safe: true, reason: 'check_failed' };
     }
   }
@@ -122,7 +125,7 @@ export class SecurityChecker {
         whitelist: Array.from(this.whitelist)
       });
     } catch (error) {
-      console.error('保存安全列表失败:', error);
+      logger.error('保存安全列表失败:', error);
     }
   }
 
@@ -136,7 +139,7 @@ export class SecurityChecker {
         this.whitelist = new Set(result.whitelist);
       }
     } catch (error) {
-      console.error('加载安全列表失败:', error);
+      logger.error('加载安全列表失败:', error);
     }
   }
 

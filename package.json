@@ -1,11 +1,13 @@
 {
   "name": "open-multiple-urls",
-  "version": "1.2.3",
+  "version": "1.4.1",
   "description": "A Chrome extension for opening multiple URLs",
   "main": "popup.js",
+  "type": "module",
   "scripts": {
     "build": "tailwindcss -i ./input.css -o ./dist/output.css --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "update-version": "node scripts/update-version.js"
   },
   "keywords": [],
   "author": "",

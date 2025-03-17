@@ -2,6 +2,8 @@
 import { URLProcessor } from './modules/url-processor.js';
 import { CacheManager } from './modules/cache-manager.js';
 import { SecurityChecker } from './modules/security-checker.js';
+import { logger } from './modules/logger.js';
+import { messaging } from './modules/messaging.js';
 
 // 初始化模块
 const urlProcessor = new URLProcessor();
@@ -30,6 +32,30 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       console.warn('Unknown message type:', request.type);
   }
   return true; // 保持消息通道开放
+});
+
+// 初始化消息监听
+messaging.addListener(async (message, sender) => {
+    try {
+        switch (message.type) {
+            case 'LANGUAGE_CHANGED':
+                // 处理语言变更
+                await handleLanguageChange(message.data);
+                return { success: true };
+                
+            case 'SETTINGS_UPDATED':
+                // 处理设置更新
+                await handleSettingsUpdate(message.data);
+                return { success: true };
+                
+            default:
+                logger.warn('未知的消息类型:', message.type);
+                return { error: 'Unknown message type' };
+        }
+    } catch (error) {
+        logger.error('消息处理失败:', error);
+        return { error: error.message };
+    }
 });
 
 // 处理 URL 处理请求
@@ -113,6 +139,60 @@ chrome.webRequest.onBeforeRequest.addListener(
   },
   { urls: ['<all_urls>'] }
 );
+
+// 处理语言变更
+async function handleLanguageChange({ locale }) {
+    try {
+        // 更新存储的语言设置
+        await chrome.storage.local.set({ language: locale });
+        
+        // 通知所有标签页
+        const tabs = await chrome.tabs.query({});
+        for (const tab of tabs) {
+            try {
+                await chrome.tabs.sendMessage(tab.id, {
+                    type: 'LANGUAGE_UPDATED',
+                    data: { locale }
+                });
+            } catch (error) {
+                // 忽略不能接收消息的标签页
+                logger.debug('标签页消息发送失败:', tab.id, error);
+            }
+        }
+        
+        logger.info('语言设置已更新:', locale);
+    } catch (error) {
+        logger.error('处理语言变更失败:', error);
+        throw error;
+    }
+}
+
+// 处理设置更新
+async function handleSettingsUpdate(settings) {
+    try {
+        // 更新存储的设置
+        await chrome.storage.local.set({ settings });
+        
+        // 通知所有标签页
+        const tabs = await chrome.tabs.query({});
+        for (const tab of tabs) {
+            try {
+                await chrome.tabs.sendMessage(tab.id, {
+                    type: 'SETTINGS_UPDATED',
+                    data: settings
+                });
+            } catch (error) {
+                // 忽略不能接收消息的标签页
+                logger.debug('标签页消息发送失败:', tab.id, error);
+            }
+        }
+        
+        logger.info('设置已更新');
+    } catch (error) {
+        logger.error('处理设置更新失败:', error);
+        throw error;
+    }
+}
 
 // 导出模块供其他文件使用
 export { urlProcessor, cacheManager, securityChecker }; 

@@ -5,14 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title data-i18n="title">批量打开URL</title>
   <link href="./dist/output.css" rel="stylesheet">
-  <script>
-    // 检查并应用深色模式
-    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  </script>
+  <script src="theme-init.js"></script>
 </head>
 <body class="w-[500px] p-5 bg-gray-100 dark:bg-gray-800 transition-colors duration-200">
   <div class="space-y-4">

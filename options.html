@@ -16,13 +16,6 @@
             background-color: rgb(55 65 81);
         }
     </style>
-    <script>
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark')
-        } else {
-            document.documentElement.classList.remove('dark')
-        }
-    </script>
 </head>
 <body class="bg-gray-100 dark:bg-gray-800 min-h-screen transition-colors duration-200">
     <div class="container max-w-4xl mx-auto p-6 flex gap-6">
@@ -34,6 +27,7 @@
                 <button data-section="appearance" class="w-full text-left px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors nav-item font-medium" data-i18n="appearanceSettings">外观设置</button>
                 <button data-section="url" class="w-full text-left px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors nav-item font-medium" data-i18n="urlSettings">URL设置</button>
                 <button data-section="advanced" class="w-full text-left px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors nav-item font-medium" data-i18n="advancedSettings">高级设置</button>
+                <button data-section="game2024" class="w-full text-left px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors nav-item font-medium" data-i18n="game2024">2024 Game</button>
                 <button data-section="about" class="w-full text-left px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors nav-item font-medium" data-i18n="about">关于</button>
             </nav>
         </div>
@@ -109,6 +103,28 @@
                     <div class="flex items-center space-x-2">
                         <input type="checkbox" id="enableDebugMode" class="rounded text-indigo-600 border-gray-300 dark:border-gray-600 focus:ring-indigo-500/50">
                         <label for="enableDebugMode" class="text-sm text-gray-600 dark:text-gray-300" data-i18n="enableDebugMode">启用调试模式</label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2024游戏 -->
+            <section id="game2024" class="section-content bg-white dark:bg-gray-700 rounded-lg p-5 shadow-md border border-gray-200 dark:border-gray-600">
+                <h3 class="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4" data-i18n="game2024">2024 Game</h3>
+                <div class="space-y-4">
+                    <div class="game-container relative w-full max-w-md mx-auto p-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-bold dark:text-white">2048</h2>
+                            <div class="flex items-center gap-4">
+                                <div class="text-right">
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">Score</div>
+                                    <div id="game-score" class="text-xl font-bold dark:text-white">0</div>
+                                </div>
+                                <button id="new-game-btn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+                                    New Game
+                                </button>
+                            </div>
+                        </div>
+                        <div id="game-grid" class="grid grid-cols-4 gap-2 bg-gray-300 dark:bg-gray-700 p-2 rounded-lg aspect-square"></div>
                     </div>
                 </div>
             </section>

@@ -2,6 +2,8 @@ import { URLProcessor } from './modules/url-processor.js';
 import { CacheManager } from './modules/cache-manager.js';
 import { SecurityChecker } from './modules/security-checker.js';
 import { I18n } from './modules/i18n.js';
+import { logger } from './modules/logger.js';
+import { messaging } from './modules/messaging.js';
 
 document.addEventListener('DOMContentLoaded', function() {
   // 初始化模块
@@ -138,20 +140,37 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   // 切换深色模式
-  const toggleDarkMode = () => {
+  const toggleDarkMode = async () => {
     isDarkMode = !isDarkMode;
+    const theme = isDarkMode ? 'dark' : 'light';
+    
+    // 更新 UI
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
-      localStorage.theme = 'dark';
       sunIcon.classList.add('hidden');
       moonIcon.classList.remove('hidden');
     } else {
       document.documentElement.classList.remove('dark');
-      localStorage.theme = 'light';
       sunIcon.classList.remove('hidden');
       moonIcon.classList.add('hidden');
     }
-    chrome.storage.local.set({ darkMode: isDarkMode });
+
+    // 保存设置
+    try {
+      const result = await chrome.storage.local.get('settings');
+      const settings = result.settings || {};
+      settings.theme = theme;
+      await chrome.storage.local.set({ settings });
+
+      // 发送消息通知其他页面
+      await chrome.runtime.sendMessage({ 
+        type: 'themeChanged', 
+        darkMode: isDarkMode,
+        theme: theme
+      });
+    } catch (error) {
+      console.error('保存主题设置失败:', error);
+    }
   };
 
   // 从Chrome Storage恢复设置和URL
@@ -159,6 +178,8 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
       const result = await chrome.storage.local.get({
         settings: {
+          language: 'zh',
+          theme: 'system',
           delayLoad: false,
           preserveInput: false,
           removeDuplicates: false,
@@ -170,14 +191,12 @@ document.addEventListener('DOMContentLoaded', function() {
           urlCategory: 'none',
           maxUrls: 20,
           checkSecurity: true
-        },
-        lastUrls: '',
-        darkMode: window.matchMedia('(prefers-color-scheme: dark)').matches,
-        locale: 'zh'
+        }
       });
 
-      const { settings, lastUrls, darkMode, locale } = result;
+      const { settings } = result;
       
+      // 应用设置
       delayLoad.checked = settings.delayLoad;
       preserveInput.checked = settings.preserveInput;
       removeDuplicates.checked = settings.removeDuplicates;
@@ -190,7 +209,9 @@ document.addEventListener('DOMContentLoaded', function() {
       maxUrls.value = settings.maxUrls;
 
       // 恢复深色模式
-      isDarkMode = darkMode;
+      isDarkMode = settings.theme === 'dark' || 
+        (settings.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      
       if (isDarkMode) {
         document.documentElement.classList.add('dark');
         sunIcon.classList.add('hidden');
@@ -202,13 +223,14 @@ document.addEventListener('DOMContentLoaded', function() {
       }
 
       // 恢复语言设置
-      if (locale) {
-        i18n.setLocale(locale);
-        languageSelect.value = locale;
+      if (settings.language) {
+        i18n.setLocale(settings.language);
+        languageSelect.value = settings.language;
         updateUIText();
       }
 
       // 恢复上次的URL列表
+      const { lastUrls } = await chrome.storage.local.get({ lastUrls: '' });
       if (lastUrls) {
         urlInput.value = lastUrls;
         updateUrlCount();
@@ -231,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
         openOrder: openOrder.value,
         groupOption: groupOption.value,
         urlCategory: urlCategory.value,
-        maxUrls: maxUrls.value
+        maxUrls: parseInt(maxUrls.value, 10)
       };
 
       console.log('[URL Opener v1.4.0] 正在保存设置:', settings);
@@ -261,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function() {
         validate: false,
         removeDuplicates: false,
         autoProtocol: autoProtocol.checked,
-        maxUrls: parseInt(maxUrls.value)
+        maxUrls: parseInt(maxUrls.value, 10)
       });
       
       urlCount.textContent = i18n.t('urlCount', { count: urls.length });
@@ -302,12 +324,12 @@ document.addEventListener('DOMContentLoaded', function() {
       
       for (const [index, url] of processedUrls.entries()) {
         const div = document.createElement('div');
-        div.className = 'flex items-center space-x-2 p-2 hover:bg-pink-50 dark:hover:bg-gray-700 rounded';
+        div.className = 'flex items-center space-x-2 p-2 hover:bg-slate-50 dark:hover:bg-slate-700 rounded';
         
         div.innerHTML = `
-          <input type="checkbox" class="rounded text-pink-500 border-pink-300 dark:border-gray-600" checked>
-          <span class="text-sm text-pink-600 dark:text-pink-400">${index + 1}.</span>
-          <span class="text-sm text-pink-600 dark:text-pink-400 truncate" title="${url}">${url}</span>
+          <input type="checkbox" class="rounded text-slate-500 border-slate-300 dark:border-slate-600" checked>
+          <span class="text-sm text-slate-600 dark:text-slate-400">${index + 1}.</span>
+          <span class="text-sm text-slate-600 dark:text-slate-400 truncate" title="${url}">${url}</span>
         `;
         urlPreviewList.appendChild(div);
       }
@@ -348,9 +370,11 @@ document.addEventListener('DOMContentLoaded', function() {
       }
 
       // 限制URL数量
-      if (urls.length > maxUrls.value) {
-        urls = urls.slice(0, maxUrls.value);
-        console.log(`[URL Opener v1.4.0] URL数量超过限制，已截取前 ${maxUrls.value} 个`);
+      const maxUrlCount = parseInt(maxUrls.value, 10);
+      if (urls.length > maxUrlCount) {
+        urls = urls.slice(0, maxUrlCount);
+        console.log(`[URL Opener v1.4.0] URL数量超过限制，已截取前 ${maxUrlCount} 个`);
+        showStatus(i18n.t('maxUrlsLimitReached', { count: maxUrlCount }), 'warning');
       }
 
       // 安全检查
@@ -726,10 +750,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const locale = e.target.value;
     if (i18n.setLocale(locale)) {
       updateUIText();
-      await i18n.saveLocale();
-      saveSettings();
+      
+      // 保存设置
+      try {
+        await saveLanguageSetting(locale);
+      } catch (error) {
+        console.error('保存语言设置失败:', error);
+      }
     }
   });
+
+  // 保存语言设置
+  async function saveLanguageSetting(locale) {
+    try {
+      await chrome.storage.local.set({ language: locale });
+      // 使用新的消息处理工具
+      await messaging.sendMessage({
+        type: 'LANGUAGE_CHANGED',
+        data: { locale }
+      });
+      logger.info('语言设置已保存:', locale);
+    } catch (error) {
+      logger.error('保存语言设置失败:', error);
+      throw error;
+    }
+  }
 
   // 初始化时恢复设置
   restoreSettings();
