@@ -50,29 +50,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 显示状态信息
   const showStatus = (message, type = 'success') => {
-    const statusContainer = document.getElementById('statusContainer');
-    const statusDiv = document.createElement('div');
-    statusDiv.className = `fixed top-4 left-1/2 -translate-x-1/2 px-6 py-3 rounded-lg text-white transition-all duration-300 transform translate-y-0 opacity-100 bg-gradient-to-r ${type === 'success' ? 'from-green-500/95 to-green-600/95' : 'from-red-500/95 to-red-600/95'} backdrop-blur-sm shadow-xl z-50`;
+    // 直接更新状态区域，不显示浮动弹窗
     statusDiv.textContent = message;
+    statusDiv.classList.remove('hidden', 'text-green-600', 'text-red-600', 'text-yellow-600');
     
-    // 添加到容器
-    statusContainer.appendChild(statusDiv);
-
-    // 淡出动画
+    if (type === 'success') {
+      statusDiv.classList.add('text-green-600');
+    } else if (type === 'error') {
+      statusDiv.classList.add('text-red-600');
+    } else if (type === 'warning') {
+      statusDiv.classList.add('text-yellow-600');
+    } else {
+      statusDiv.classList.add('text-blue-600');
+    }
+    
+    // 3秒后自动隐藏状态消息
     setTimeout(() => {
-      statusDiv.style.opacity = '0';
-      statusDiv.style.transform = 'translateY(-100%)';
-      setTimeout(() => statusDiv.remove(), 300);
+      statusDiv.classList.add('hidden');
     }, 3000);
   };
-
-  // 移除不再需要的状态模态框相关代码
-  // const hideStatus = () => {
-  //   statusModal.classList.remove('flex');
-  //   statusModal.classList.add('hidden');
-  // };
-  
-  // closeStatus.addEventListener('click', hideStatus);
 
   // 隐藏状态信息
   const hideStatus = () => {
@@ -147,101 +143,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // 更新 UI
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
-      sunIcon.classList.add('hidden');
-      moonIcon.classList.remove('hidden');
-    } else {
-      document.documentElement.classList.remove('dark');
       sunIcon.classList.remove('hidden');
       moonIcon.classList.add('hidden');
+    } else {
+      document.documentElement.classList.remove('dark');
+      sunIcon.classList.add('hidden');
+      moonIcon.classList.remove('hidden');
     }
 
-    // 保存设置
+    // 保存到 localStorage
+    localStorage.setItem('theme', theme);
+    
+    // 保存到 Chrome 存储
     try {
-      const result = await chrome.storage.local.get('settings');
-      const settings = result.settings || {};
-      settings.theme = theme;
-      await chrome.storage.local.set({ settings });
-
-      // 发送消息通知其他页面
-      await chrome.runtime.sendMessage({ 
-        type: 'themeChanged', 
-        darkMode: isDarkMode,
-        theme: theme
-      });
+      await chrome.storage.local.set({ darkMode: isDarkMode });
     } catch (error) {
-      console.error('保存主题设置失败:', error);
+      console.error('保存深色模式设置失败:', error);
     }
   };
 
-  // 从Chrome Storage恢复设置和URL
-  const restoreSettings = async () => {
-    try {
-      const result = await chrome.storage.local.get({
-        settings: {
-          language: 'zh',
-          theme: 'system',
-          delayLoad: false,
-          preserveInput: false,
-          removeDuplicates: false,
-          searchNonUrls: false,
-          validateUrls: false,
-          autoProtocol: true,
-          openOrder: 'normal',
-          groupOption: 'none',
-          urlCategory: 'none',
-          maxUrls: 20,
-          checkSecurity: true
-        }
-      });
-
-      const { settings } = result;
-      
-      // 应用设置
-      delayLoad.checked = settings.delayLoad;
-      preserveInput.checked = settings.preserveInput;
-      removeDuplicates.checked = settings.removeDuplicates;
-      searchNonUrls.checked = settings.searchNonUrls;
-      validateUrls.checked = settings.validateUrls;
-      autoProtocol.checked = settings.autoProtocol;
-      openOrder.value = settings.openOrder;
-      groupOption.value = settings.groupOption;
-      urlCategory.value = settings.urlCategory;
-      maxUrls.value = settings.maxUrls;
-
-      // 恢复深色模式
-      isDarkMode = settings.theme === 'dark' || 
-        (settings.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-      
-      if (isDarkMode) {
-        document.documentElement.classList.add('dark');
-        sunIcon.classList.add('hidden');
-        moonIcon.classList.remove('hidden');
-      } else {
-        document.documentElement.classList.remove('dark');
-        sunIcon.classList.remove('hidden');
-        moonIcon.classList.add('hidden');
-      }
-
-      // 恢复语言设置
-      if (settings.language) {
-        i18n.setLocale(settings.language);
-        languageSelect.value = settings.language;
-        updateUIText();
-      }
-
-      // 恢复上次的URL列表
-      const { lastUrls } = await chrome.storage.local.get({ lastUrls: '' });
-      if (lastUrls) {
-        urlInput.value = lastUrls;
-        updateUrlCount();
-      }
-    } catch (error) {
-      console.error('恢复设置失败:', error);
-    }
-  };
-
-  // 保存设置到Chrome Storage
-  const saveSettings = async () => {
+  // 保存设置
+  const saveSettings = async (showMessage = false) => {
     try {
       const settings = {
         delayLoad: delayLoad.checked,
@@ -267,11 +189,58 @@ document.addEventListener('DOMContentLoaded', function() {
       });
 
       console.log('[URL Opener v1.4.0] 设置保存成功');
-      showStatus(i18n.t('settingsSaved'), 'success');
+      
+      // 只有在明确要求时才显示保存成功的提示
+      if (showMessage) {
+        showStatus(i18n.t('settingsSaved'), 'success');
+      }
     } catch (error) {
       console.error('[URL Opener v1.4.0] 保存设置失败:', error);
       showStatus(i18n.t('settingsSaveError', { message: error.message }), 'error');
       throw error;
+    }
+  };
+
+  // 恢复设置
+  const restoreSettings = async () => {
+    try {
+      const result = await chrome.storage.local.get(['settings', 'lastUrls', 'darkMode', 'locale']);
+      
+      if (result.settings) {
+        delayLoad.checked = result.settings.delayLoad || false;
+        preserveInput.checked = result.settings.preserveInput || false;
+        removeDuplicates.checked = result.settings.removeDuplicates || false;
+        searchNonUrls.checked = result.settings.searchNonUrls || false;
+        validateUrls.checked = result.settings.validateUrls || false;
+        autoProtocol.checked = result.settings.autoProtocol || false;
+        openOrder.value = result.settings.openOrder || 'normal';
+        groupOption.value = result.settings.groupOption || 'none';
+        urlCategory.value = result.settings.urlCategory || 'none';
+        maxUrls.value = result.settings.maxUrls || 20;
+      }
+
+      if (result.lastUrls) {
+        urlInput.value = result.lastUrls;
+      }
+
+      if (result.darkMode !== undefined) {
+        isDarkMode = result.darkMode;
+        if (isDarkMode) {
+          document.documentElement.classList.add('dark');
+          sunIcon.classList.remove('hidden');
+          moonIcon.classList.add('hidden');
+        }
+      }
+
+      if (result.locale) {
+        i18n.setLocale(result.locale);
+        updateUIText();
+      }
+
+      // 更新URL计数
+      await updateUrlCount();
+    } catch (error) {
+      console.error('恢复设置失败:', error);
     }
   };
 
@@ -295,71 +264,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   };
 
-  // 显示URL预览
-  const showUrlPreview = async (urls) => {
-    try {
-      urlPreviewList.innerHTML = '';
-      
-      // 使用与提取URL相同的正则表达式和处理逻辑
-      const urlRegex = /(?:(?:https?:\/\/)?(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}|(?:\d{1,3}\.){3}\d{1,3})(?::\d{1,5})?(?:\/[^\s]*)?)|(?:(?:https?:\/\/)\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?::\d{1,5})?(?:\/[^\s]*)?)/gi;
-      
-      const processedUrls = [];
-      for (const url of urls) {
-        const urlMatches = url.match(urlRegex);
-        if (urlMatches) {
-          for (const match of urlMatches) {
-            // 额外验证，确保不是纯数字
-            if (!/^\d+(\.\d+)*$/.test(match.replace(/^https?:\/\//, ''))) {
-              const processedUrl = urlProcessor.preprocessUrl(match, autoProtocol.checked);
-              if (processedUrl) {
-                processedUrls.push(processedUrl);
-              }
-            }
-          }
-        }
-      }
-      
-      // 更新待处理的URL列表
-      pendingUrls = processedUrls;
-      
-      for (const [index, url] of processedUrls.entries()) {
-        const div = document.createElement('div');
-        div.className = 'flex items-center space-x-2 p-2 hover:bg-slate-50 dark:hover:bg-slate-700 rounded';
-        
-        div.innerHTML = `
-          <input type="checkbox" class="rounded text-slate-500 border-slate-300 dark:border-slate-600" checked>
-          <span class="text-sm text-slate-600 dark:text-slate-400">${index + 1}.</span>
-          <span class="text-sm text-slate-600 dark:text-slate-400 truncate" title="${url}">${url}</span>
-        `;
-        urlPreviewList.appendChild(div);
-      }
-      
-      urlPreviewModal.classList.remove('hidden');
-      urlPreviewModal.classList.add('flex');
-    } catch (error) {
-      console.error('显示URL预览失败:', error);
-      statusDiv.textContent = i18n.t('error', { message: error.message });
-      statusDiv.classList.remove('hidden', 'text-green-600');
-      statusDiv.classList.add('text-red-600');
-    }
-  };
-
-  // 统一的错误处理函数
-  const handleError = async (error, operation, retryCount = 3) => {
-    console.error(`[URL Opener v1.4.0] ${operation} 失败:`, error);
-    
-    if (retryCount > 0) {
+  // 按域名分组URL
+  const groupUrlsByDomain = (urls) => {
+    const groups = {};
+    urls.forEach(url => {
       try {
-        showStatus(i18n.t('retrying', { count: 4 - retryCount }), 'info');
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        return true; // 允许重试
-      } catch (retryError) {
-        return handleError(retryError, operation, retryCount - 1);
+        const urlObj = new URL(url.startsWith('http') ? url : `http://${url}`);
+        const domain = urlObj.hostname;
+        if (!groups[domain]) {
+          groups[domain] = [];
+        }
+        groups[domain].push(url);
+      } catch (error) {
+        console.error(`[URL Opener v1.4.0] 处理域名时出错: ${url}, ${error.message}`);
       }
-    }
-    
-    showStatus(i18n.t('error', { message: error.message }), 'error');
-    return false; // 不再重试
+    });
+    return groups;
   };
 
   // 打开URL
@@ -395,12 +315,22 @@ document.addEventListener('DOMContentLoaded', function() {
           const j = Math.floor(Math.random() * (i + 1));
           [urls[i], urls[j]] = [urls[j], urls[i]];
         }
+      } else if (openOrder.value === 'domain') {
+        urls.sort((a, b) => {
+          try {
+            const domainA = new URL(a.startsWith('http') ? a : `http://${a}`).hostname;
+            const domainB = new URL(b.startsWith('http') ? b : `http://${b}`).hostname;
+            return domainA.localeCompare(domainB);
+          } catch {
+            return 0;
+          }
+        });
       }
 
       // 显示进度条
       progressContainer.classList.remove('hidden');
       progressBar.style.width = '0%';
-      progressText.textContent = `0/${urls.length}`;
+      progressText.textContent = '0/' + urls.length;
 
       // 创建标签页
       const tabs = [];
@@ -464,17 +394,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
 
-      // 更新状态信息
+      // 隐藏进度条
+      progressContainer.classList.add('hidden');
+
+      // 更新状态
       if (failCount > 0) {
         statusDiv.textContent = `成功打开 ${successCount} 个URL，失败 ${failCount} 个`;
-        statusDiv.className = 'text-lg font-medium text-red-600 dark:text-red-400';
-        statusModal.classList.remove('hidden');
-        statusModal.classList.add('flex');
+        statusDiv.classList.remove('hidden', 'text-green-600');
+        statusDiv.classList.add('text-red-600');
       } else {
         statusDiv.textContent = `成功打开 ${successCount} 个URL`;
-        statusDiv.className = 'text-lg font-medium text-green-600 dark:text-green-400';
-        statusModal.classList.remove('hidden');
-        statusModal.classList.add('flex');
+        statusDiv.classList.remove('hidden', 'text-red-600');
+        statusDiv.classList.add('text-green-600');
       }
 
       return successCount;
@@ -484,46 +415,27 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   };
 
-  // 按域名分类URL
-  const groupUrlsByDomain = (urls) => {
-    const groups = {};
-    urls.forEach(url => {
-      try {
-        const domain = new URL(url).hostname;
-        if (!groups[domain]) {
-          groups[domain] = [];
-        }
-        groups[domain].push(url);
-      } catch (error) {
-        console.error(`[URL Opener v1.4.0] 处理域名时出错: ${url}, ${error.message}`);
-      }
-    });
-    return groups;
-  };
-
   // 导入URL
   const importUrls = () => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.txt,.json,.csv';
+    input.accept = '.txt,.json';
     input.onchange = async (e) => {
       const file = e.target.files[0];
       if (file) {
         try {
-          const content = await file.text();
+          const text = await file.text();
           let urls = [];
-
+          
           if (file.name.endsWith('.json')) {
-            const data = JSON.parse(content);
-            urls = Array.isArray(data) ? data : data.urls;
-          } else if (file.name.endsWith('.csv')) {
-            urls = content.split('\n')
-              .map(line => line.split(',')[0].trim())
-              .filter(url => url);
+            const data = JSON.parse(text);
+            urls = data.urls || [];
           } else {
-            urls = content.split('\n')
-              .map(line => line.trim())
-              .filter(line => line);
+            urls = text.split('\n').filter(url => url.trim() !== '');
+          }
+
+          if (urls.length === 0) {
+            throw new Error('文件中没有找到有效的URL');
           }
 
           console.log(`[URL Opener v1.4.0] 导入文件成功: ${file.name}, 包含 ${urls.length} 个URL`);
@@ -575,14 +487,23 @@ document.addEventListener('DOMContentLoaded', function() {
   
   openUrlsButton.addEventListener('click', async () => {
     try {
-      // 获取并处理URL列表
+      // 显示处理状态
+      statusDiv.textContent = i18n.t('processing');
+      statusDiv.classList.remove('hidden', 'text-green-600', 'text-red-600');
+      statusDiv.classList.add('text-yellow-600');
+
+      // 获取输入文本并处理
       const inputText = urlInput.value;
       const lines = inputText.split('\n').filter(line => line.trim());
-      let urls = [];
+      
+      if (lines.length === 0) {
+        throw new Error(i18n.t('noValidUrls'));
+      }
 
-      // 使用与提取URL相同的正则表达式和处理逻辑
+      // 使用正则表达式提取URL
       const urlRegex = /(?:(?:https?:\/\/)?(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}|(?:\d{1,3}\.){3}\d{1,3})(?::\d{1,5})?(?:\/[^\s]*)?)|(?:(?:https?:\/\/)\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?::\d{1,5})?(?:\/[^\s]*)?)/gi;
-
+      
+      const urls = [];
       for (const line of lines) {
         const urlMatches = line.match(urlRegex);
         if (urlMatches) {
@@ -598,78 +519,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
 
-      console.log(`处理后的URL数量: ${urls.length}`);
-
-      // 去除重复URL
-      if (removeDuplicates.checked) {
-        const originalLength = urls.length;
-        urls = [...new Set(urls)];
-        console.log(`去重后的URL数量: ${urls.length} (移除了 ${originalLength - urls.length} 个重复URL)`);
-      }
-
       if (urls.length === 0) {
         throw new Error(i18n.t('noValidUrls'));
       }
 
-      // 保存待处理的URL列表
-      pendingUrls = urls;
-      // 显示URL预览
-      await showUrlPreview(urls);
-    } catch (error) {
-      console.error('操作失败:', error);
-      statusDiv.textContent = i18n.t('error', { message: error.message });
-      statusDiv.classList.remove('hidden', 'text-green-600');
-      statusDiv.classList.add('text-red-600');
-    }
-  });
-
-  confirmOpen.addEventListener('click', async () => {
-    try {
-      const checkboxes = urlPreviewList.querySelectorAll('input[type="checkbox"]');
-      const urls = Array.from(checkboxes)
-        .map((checkbox, index) => checkbox.checked ? pendingUrls[index] : null)
-        .filter(url => url !== null);
-
-      if (urls.length === 0) {
-        throw new Error(i18n.t('selectAtLeastOne'));
-      }
-
-      urlPreviewModal.classList.add('hidden');
-      urlPreviewModal.classList.remove('flex');
-      
+      // 直接打开URL，不显示预览弹窗
       const count = await openUrls(urls);
       
-      // 创建并显示成功提示弹窗
-      const successToast = document.createElement('div');
-      successToast.className = 'fixed top-4 right-4 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 flex items-center space-x-2 transform transition-all duration-300 translate-y-0 opacity-100';
-      successToast.innerHTML = `
-        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-        </svg>
-        <span class="text-gray-900 dark:text-gray-100">${i18n.t('success', { count })}</span>
-      `;
-      document.body.appendChild(successToast);
-
-      // 3秒后淡出并移除弹窗
-      setTimeout(() => {
-        successToast.style.opacity = '0';
-        successToast.style.transform = 'translateY(-100%)';
-        setTimeout(() => successToast.remove(), 300);
-      }, 3000);
-
-      // 保存设置
-      saveSettings();
+      // 显示成功状态
+      showStatus(i18n.t('success', { count }), 'success');
+      
+      // 保存设置（不显示提示）
+      saveSettings(false);
     } catch (error) {
       console.error('操作失败:', error);
-      statusDiv.textContent = i18n.t('error', { message: error.message });
-      statusDiv.classList.remove('hidden', 'text-green-600');
-      statusDiv.classList.add('text-red-600');
+      showStatus(i18n.t('error', { message: error.message }), 'error');
     }
-  });
-
-  closePreview.addEventListener('click', () => {
-    urlPreviewModal.classList.add('hidden');
-    urlPreviewModal.classList.remove('flex');
   });
 
   extractUrlsButton.addEventListener('click', async () => {
@@ -693,9 +558,6 @@ document.addEventListener('DOMContentLoaded', function() {
       const urls = [];
       for (const line of lines) {
         // 使用更精确的正则表达式匹配 URL
-        // 1. 匹配带协议的完整 URL
-        // 2. 匹配 IP 地址（包含端口）
-        // 3. 匹配域名（包含端口和路径）
         const urlRegex = /(?:(?:https?:\/\/)?(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}|(?:\d{1,3}\.){3}\d{1,3})(?::\d{1,5})?(?:\/[^\s]*)?)|(?:(?:https?:\/\/)\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?::\d{1,5})?(?:\/[^\s]*)?)/gi;
         
         const urlMatches = line.match(urlRegex);
