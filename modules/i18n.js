@@ -95,6 +95,7 @@ export class I18n {
         contentTab: '内容替换',
         notepadTab: '记事本',
         calculatorTab: '计算器',
+        musicTab: '音乐',
         youtubeTab: '视频',
 
         // 内容替换相关
@@ -157,6 +158,13 @@ export class I18n {
         calculatorHistory: '计算历史',
         clearHistory: '清空历史',
         calculatorDisplay: '计算器显示',
+        // 音乐相关
+        musicPlayer: '网易云音乐',
+        randomPlay: '随机播放',
+        stopMusic: '停止',
+        openMusic: '打开',
+        playHistory: '播放历史',
+        popularPlaylists: '热门歌单',
         // 状态消息
         status: '状态',
         processing: '处理中...',
@@ -317,6 +325,7 @@ export class I18n {
         contentTab: 'Content Replacement',
         notepadTab: 'Notepad',
         calculatorTab: 'Calculator',
+        musicTab: 'Music',
         youtubeTab: 'Videos',
         // Content replacement related
         contentReplaceLabel: 'Content Replacement',
@@ -378,6 +387,13 @@ export class I18n {
         calculatorHistory: 'Calculation History',
         clearHistory: 'Clear History',
         calculatorDisplay: 'Calculator Display',
+        // Music related
+        musicPlayer: 'NetEase Cloud Music',
+        randomPlay: 'Random Play',
+        stopMusic: 'Stop',
+        openMusic: 'Open',
+        playHistory: 'Play History',
+        popularPlaylists: 'Popular Playlists',
         // Status messages
         status: 'Status',
         processing: 'Processing...',

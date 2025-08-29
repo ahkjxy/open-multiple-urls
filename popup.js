@@ -570,8 +570,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // 标签页切换功能
   function switchTab(activeTab, activeContent) {
     // 所有标签页
-    const allTabs = [urlTab, contentTab, notepadTab, calculatorTab, youtubeTab];
-    const allContents = [urlContent, contentReplaceContent, notepadContent, calculatorContent, youtubeContent];
+    const allTabs = [urlTab, contentTab, notepadTab, calculatorTab, musicTab, youtubeTab];
+    const allContents = [urlContent, contentReplaceContent, notepadContent, calculatorContent, musicContent, youtubeContent];
     
     // 重置所有标签页状态
     allTabs.forEach(tab => {
@@ -608,6 +608,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   calculatorTab.addEventListener('click', () => {
     switchTab(calculatorTab, calculatorContent);
+  });
+
+  musicTab.addEventListener('click', () => {
+    switchTab(musicTab, musicContent);
   });
 
   youtubeTab.addEventListener('click', () => {
@@ -1432,6 +1436,123 @@ document.addEventListener('DOMContentLoaded', function() {
     calculatorHistoryList = [];
     updateHistoryDisplay();
   }
+
+  // 音乐功能
+  let musicHistory = [];
+  let currentMusic = null;
+
+  // 网易云音乐热门歌单和歌曲
+  const neteaseMusicList = [
+    // 热门歌单
+    { id: 1, title: '热歌榜', artist: '网易云音乐', url: 'https://music.163.com/#/discover/toplist?id=3778678' },
+    { id: 2, title: '新歌榜', artist: '网易云音乐', url: 'https://music.163.com/#/discover/toplist?id=3779629' },
+    { id: 3, title: '原创榜', artist: '网易云音乐', url: 'https://music.163.com/#/discover/toplist?id=2884035' },
+    { id: 4, title: '飙升榜', artist: '网易云音乐', url: 'https://music.163.com/#/discover/toplist?id=19723756' },
+    { id: 5, title: '电音榜', artist: '网易云音乐', url: 'https://music.163.com/#/discover/toplist?id=10520166' },
+    { id: 6, title: '说唱榜', artist: '网易云音乐', url: 'https://music.163.com/#/discover/toplist?id=991319590' },
+    { id: 7, title: '民谣榜', artist: '网易云音乐', url: 'https://music.163.com/#/discover/toplist?id=5059661515' },
+    { id: 8, title: '摇滚榜', artist: '网易云音乐', url: 'https://music.163.com/#/discover/toplist?id=5059661515' },
+    { id: 9, title: '古风榜', artist: '网易云音乐', url: 'https://music.163.com/#/discover/toplist?id=5059661515' },
+    { id: 10, title: '欧美榜', artist: '网易云音乐', url: 'https://music.163.com/#/discover/toplist?id=2809513713' },
+    
+    // 经典歌曲
+    { id: 11, title: '起风了', artist: '买辣椒也用券', url: 'https://music.163.com/#/song?id=1330348068' },
+    { id: 12, title: '孤勇者', artist: '陈奕迅', url: 'https://music.163.com/#/song?id=1901371647' },
+    { id: 13, title: '光年之外', artist: 'G.E.M.邓紫棋', url: 'https://music.163.com/#/song?id=449818741' },
+    { id: 14, title: '海阔天空', artist: 'Beyond', url: 'https://music.163.com/#/song?id=347230' },
+    { id: 15, title: '成都', artist: '赵雷', url: 'https://music.163.com/#/song?id=436514312' },
+    { id: 16, title: '稻香', artist: '周杰伦', url: 'https://music.163.com/#/song?id=185809' },
+    { id: 17, title: '青花瓷', artist: '周杰伦', url: 'https://music.163.com/#/song?id=185809' },
+    { id: 18, title: '告白气球', artist: '周杰伦', url: 'https://music.163.com/#/song?id=418603077' },
+    { id: 19, title: '演员', artist: '薛之谦', url: 'https://music.163.com/#/song?id=32507038' },
+    { id: 20, title: '消愁', artist: '毛不易', url: 'https://music.163.com/#/song?id=569213220' },
+    { id: 21, title: '江南', artist: '林俊杰', url: 'https://music.163.com/#/song?id=186001' },
+    { id: 22, title: '倔强', artist: '五月天', url: 'https://music.163.com/#/song?id=386538' },
+    { id: 23, title: '童话', artist: '光良', url: 'https://music.163.com/#/song?id=386538' },
+    { id: 24, title: '勇气', artist: '梁静茹', url: 'https://music.163.com/#/song?id=386538' },
+    { id: 25, title: '小幸运', artist: '田馥甄', url: 'https://music.163.com/#/song?id=31654455' },
+    { id: 26, title: '泡沫', artist: 'G.E.M.邓紫棋', url: 'https://music.163.com/#/song?id=28188171' },
+    { id: 27, title: '夜空中最亮的星', artist: '逃跑计划', url: 'https://music.163.com/#/song?id=25706282' },
+    { id: 28, title: '董小姐', artist: '宋冬野', url: 'https://music.163.com/#/song?id=25788001' },
+    { id: 29, title: '斑马斑马', artist: '宋冬野', url: 'https://music.163.com/#/song?id=25788001' },
+    { id: 30, title: '安和桥', artist: '宋冬野', url: 'https://music.163.com/#/song?id=25788001' }
+  ];
+
+  // 随机播放音乐
+  function randomPlayMusic() {
+    const randomIndex = Math.floor(Math.random() * neteaseMusicList.length);
+    const song = neteaseMusicList[randomIndex];
+    
+    currentMusic = song;
+    
+    // 更新当前播放信息
+    document.getElementById('currentSongTitle').textContent = song.title;
+    document.getElementById('currentSongArtist').textContent = song.artist;
+    document.getElementById('currentMusicInfo').classList.remove('hidden');
+    
+    // 添加到播放历史
+    addToMusicHistory(song);
+    
+    // 打开音乐链接
+    chrome.tabs.create({ url: song.url });
+    
+    console.log(`[音乐] 随机播放: ${song.title} - ${song.artist}`);
+  }
+
+  // 停止音乐
+  function stopMusic() {
+    currentMusic = null;
+    document.getElementById('currentMusicInfo').classList.add('hidden');
+    console.log('[音乐] 停止播放');
+  }
+
+  // 添加播放历史
+  function addToMusicHistory(song) {
+    const historyItem = {
+      ...song,
+      timestamp: new Date().toLocaleTimeString()
+    };
+    
+    musicHistory.unshift(historyItem);
+    if (musicHistory.length > 10) {
+      musicHistory.pop();
+    }
+    
+    updateMusicHistoryDisplay();
+  }
+
+  // 更新播放历史显示
+  function updateMusicHistoryDisplay() {
+    const historyContainer = document.getElementById('musicHistoryList');
+    historyContainer.innerHTML = musicHistory.map(item => 
+      `<div class="flex items-center justify-between p-2 bg-slate-50 dark:bg-slate-700 rounded border-l-2 border-red-500">
+        <div class="flex-1">
+          <div class="text-sm font-medium text-slate-900 dark:text-slate-100">${item.title}</div>
+          <div class="text-xs text-slate-600 dark:text-slate-400">${item.artist} • ${item.timestamp}</div>
+        </div>
+        <button class="ml-2 px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 transition-colors" onclick="chrome.tabs.create({url: '${item.url}'})">播放</button>
+      </div>`
+    ).join('');
+  }
+
+  // 音乐事件监听器
+  document.getElementById('randomPlayBtn').addEventListener('click', randomPlayMusic);
+  document.getElementById('stopMusicBtn').addEventListener('click', stopMusic);
+  document.getElementById('openMusicBtn').addEventListener('click', () => {
+    if (currentMusic) {
+      chrome.tabs.create({ url: currentMusic.url });
+    }
+  });
+
+  // 歌单按钮事件监听器
+  document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('playlist-btn')) {
+      const playlist = e.target.getAttribute('data-playlist');
+      console.log(`[音乐] 选择歌单: ${playlist}`);
+      // 这里可以根据不同歌单类型进行不同的处理
+      randomPlayMusic();
+    }
+  });
 
   // 计算器事件监听器
   document.addEventListener('click', (e) => {
