@@ -94,7 +94,8 @@ export class I18n {
         urlTab: 'URL管理',
         contentTab: '内容替换',
         notepadTab: '记事本',
-        youtubeTab: 'YouTube',
+        calculatorTab: '计算器',
+        youtubeTab: '视频',
 
         // 内容替换相关
         contentReplaceLabel: '内容替换',
@@ -152,6 +153,10 @@ export class I18n {
         noteDeletedSuccess: '记事删除成功',
         noNoteSelected: '请先选择要编辑的记事',
         confirmDeleteNote: '确定要删除这个记事吗？',
+        // 计算器相关
+        calculatorHistory: '计算历史',
+        clearHistory: '清空历史',
+        calculatorDisplay: '计算器显示',
         // 状态消息
         status: '状态',
         processing: '处理中...',
@@ -311,7 +316,8 @@ export class I18n {
         urlTab: 'URL Management',
         contentTab: 'Content Replacement',
         notepadTab: 'Notepad',
-        youtubeTab: 'YouTube',
+        calculatorTab: 'Calculator',
+        youtubeTab: 'Videos',
         // Content replacement related
         contentReplaceLabel: 'Content Replacement',
         originalContent: 'Original Content',
@@ -368,6 +374,10 @@ export class I18n {
         noteDeletedSuccess: 'Note deleted successfully',
         noNoteSelected: 'Please select a note to edit',
         confirmDeleteNote: 'Are you sure you want to delete this note?',
+        // Calculator related
+        calculatorHistory: 'Calculation History',
+        clearHistory: 'Clear History',
+        calculatorDisplay: 'Calculator Display',
         // Status messages
         status: 'Status',
         processing: 'Processing...',

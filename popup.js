@@ -585,6 +585,7 @@ document.addEventListener('DOMContentLoaded', function() {
     urlContent.classList.remove('hidden');
     contentReplaceContent.classList.add('hidden');
     notepadContent.classList.add('hidden');
+    calculatorContent.classList.add('hidden');
     youtubeContent.classList.add('hidden');
   });
 
@@ -605,6 +606,7 @@ document.addEventListener('DOMContentLoaded', function() {
     contentReplaceContent.classList.remove('hidden');
     urlContent.classList.add('hidden');
     notepadContent.classList.add('hidden');
+    calculatorContent.classList.add('hidden');
     youtubeContent.classList.add('hidden');
   });
 
@@ -625,10 +627,34 @@ document.addEventListener('DOMContentLoaded', function() {
     notepadContent.classList.remove('hidden');
     urlContent.classList.add('hidden');
     contentReplaceContent.classList.add('hidden');
+    calculatorContent.classList.add('hidden');
     youtubeContent.classList.add('hidden');
     
     // 加载记事列表
     loadNotes();
+  });
+
+  calculatorTab.addEventListener('click', () => {
+    // 激活计算器标签页
+    calculatorTab.classList.remove('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
+    calculatorTab.classList.add('bg-blue-600', 'text-white', 'shadow-md');
+    
+    // 取消激活其他标签页
+    urlTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
+    urlTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
+    contentTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
+    contentTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
+    notepadTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
+    notepadTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
+    youtubeTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
+    youtubeTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
+    
+    // 显示对应内容
+    calculatorContent.classList.remove('hidden');
+    urlContent.classList.add('hidden');
+    contentReplaceContent.classList.add('hidden');
+    notepadContent.classList.add('hidden');
+    youtubeContent.classList.add('hidden');
   });
 
   youtubeTab.addEventListener('click', () => {
@@ -651,6 +677,7 @@ document.addEventListener('DOMContentLoaded', function() {
     urlContent.classList.add('hidden');
     contentReplaceContent.classList.add('hidden');
     notepadContent.classList.add('hidden');
+    calculatorContent.classList.add('hidden');
     
     // 清理过期缓存
     clearExpiredCache();
@@ -1351,6 +1378,190 @@ document.addEventListener('DOMContentLoaded', function() {
   youtubeSearch.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
       searchYouTubeVideos();
+    }
+  });
+
+  // 计算器功能
+  let calculatorDisplay = '0';
+  let calculatorHistory = '';
+  let calculatorMemory = 0;
+  let calculatorHistoryList = [];
+
+  // 计算器显示更新
+  function updateCalculatorDisplay() {
+    document.getElementById('calculatorDisplay').textContent = calculatorDisplay;
+    document.getElementById('calculatorHistory').textContent = calculatorHistory;
+  }
+
+  // 计算器数字输入
+  function appendNumber(number) {
+    if (calculatorDisplay === '0' && number !== '.') {
+      calculatorDisplay = number;
+    } else {
+      if (number === '.' && calculatorDisplay.includes('.')) return;
+      calculatorDisplay += number;
+    }
+    updateCalculatorDisplay();
+  }
+
+  // 计算器操作符
+  function setOperator(operator) {
+    if (calculatorDisplay !== '0') {
+      calculatorHistory = calculatorDisplay + ' ' + operator;
+      calculatorMemory = parseFloat(calculatorDisplay);
+      calculatorDisplay = '0';
+      updateCalculatorDisplay();
+    }
+  }
+
+  // 计算器计算
+  function calculate() {
+    if (calculatorHistory && calculatorDisplay !== '0') {
+      const currentNumber = parseFloat(calculatorDisplay);
+      const operator = calculatorHistory.split(' ')[1];
+      let result = 0;
+
+      switch (operator) {
+        case '+':
+          result = calculatorMemory + currentNumber;
+          break;
+        case '-':
+          result = calculatorMemory - currentNumber;
+          break;
+        case '*':
+          result = calculatorMemory * currentNumber;
+          break;
+        case '/':
+          result = calculatorMemory / currentNumber;
+          break;
+        case '%':
+          result = calculatorMemory % currentNumber;
+          break;
+      }
+
+      const calculation = `${calculatorHistory} ${calculatorDisplay} = ${result}`;
+      addToHistory(calculation);
+      
+      calculatorDisplay = result.toString();
+      calculatorHistory = '';
+      updateCalculatorDisplay();
+    }
+  }
+
+  // 计算器清除
+  function clearCalculator() {
+    calculatorDisplay = '0';
+    calculatorHistory = '';
+    updateCalculatorDisplay();
+  }
+
+  // 计算器退格
+  function backspace() {
+    if (calculatorDisplay.length > 1) {
+      calculatorDisplay = calculatorDisplay.slice(0, -1);
+    } else {
+      calculatorDisplay = '0';
+    }
+    updateCalculatorDisplay();
+  }
+
+
+
+  function percent() {
+    const num = parseFloat(calculatorDisplay);
+    const result = num / 100;
+    calculatorDisplay = result.toString();
+    updateCalculatorDisplay();
+  }
+
+  // 添加计算历史
+  function addToHistory(calculation) {
+    calculatorHistoryList.unshift(calculation);
+    if (calculatorHistoryList.length > 10) {
+      calculatorHistoryList.pop();
+    }
+    updateHistoryDisplay();
+  }
+
+  // 更新历史显示
+  function updateHistoryDisplay() {
+    const historyContainer = document.getElementById('calculatorHistoryList');
+    historyContainer.innerHTML = calculatorHistoryList.map(item => 
+      `<div class="text-xs text-slate-600 dark:text-slate-400 p-2 bg-slate-50 dark:bg-slate-700 rounded border-l-2 border-blue-500">${item}</div>`
+    ).join('');
+  }
+
+  // 清空历史
+  function clearHistory() {
+    calculatorHistoryList = [];
+    updateHistoryDisplay();
+  }
+
+  // 计算器事件监听器
+  document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('calc-btn')) {
+      const action = e.target.getAttribute('data-action');
+      const value = e.target.getAttribute('data-value');
+
+      switch (action) {
+        case 'number':
+          appendNumber(value);
+          break;
+        case 'operator':
+          setOperator(value);
+          break;
+        case 'equals':
+          calculate();
+          break;
+        case 'clear':
+          clearCalculator();
+          break;
+        case 'backspace':
+          backspace();
+          break;
+        case 'decimal':
+          appendNumber('.');
+          break;
+        case 'percent':
+          percent();
+          break;
+      }
+    }
+
+
+  });
+
+  // 清空历史按钮
+  document.getElementById('clearHistory').addEventListener('click', clearHistory);
+
+  // 键盘支持
+  document.addEventListener('keydown', (e) => {
+    if (document.getElementById('calculatorContent').classList.contains('hidden')) {
+      return;
+    }
+
+    const key = e.key;
+    
+    if (key >= '0' && key <= '9') {
+      appendNumber(key);
+    } else if (key === '.') {
+      appendNumber('.');
+    } else if (key === '+') {
+      setOperator('+');
+    } else if (key === '-') {
+      setOperator('-');
+    } else if (key === '*') {
+      setOperator('*');
+    } else if (key === '/') {
+      setOperator('/');
+    } else if (key === 'Enter' || key === '=') {
+      calculate();
+    } else if (key === 'Escape') {
+      clearCalculator();
+    } else if (key === 'Backspace') {
+      backspace();
+    } else if (key === '%') {
+      percent();
     }
   });
 });
