@@ -568,118 +568,54 @@ document.addEventListener('DOMContentLoaded', function() {
   exportUrlsButton.addEventListener('click', exportUrls);
 
   // 标签页切换功能
-  urlTab.addEventListener('click', () => {
-    // 激活URL标签页
-    urlTab.classList.remove('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    urlTab.classList.add('bg-blue-600', 'text-white', 'shadow-md');
+  function switchTab(activeTab, activeContent) {
+    // 所有标签页
+    const allTabs = [urlTab, contentTab, notepadTab, calculatorTab, youtubeTab];
+    const allContents = [urlContent, contentReplaceContent, notepadContent, calculatorContent, youtubeContent];
     
-    // 取消激活内容替换标签页
-    contentTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-    contentTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    notepadTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-    notepadTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    youtubeTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-    youtubeTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
+    // 重置所有标签页状态
+    allTabs.forEach(tab => {
+      tab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
+      tab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
+    });
+    
+    // 隐藏所有内容
+    allContents.forEach(content => {
+      content.classList.add('hidden');
+    });
+    
+    // 激活选中的标签页
+    activeTab.classList.remove('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
+    activeTab.classList.add('bg-blue-600', 'text-white', 'shadow-md');
     
     // 显示对应内容
-    urlContent.classList.remove('hidden');
-    contentReplaceContent.classList.add('hidden');
-    notepadContent.classList.add('hidden');
-    calculatorContent.classList.add('hidden');
-    youtubeContent.classList.add('hidden');
+    activeContent.classList.remove('hidden');
+  }
+
+  urlTab.addEventListener('click', () => {
+    switchTab(urlTab, urlContent);
   });
 
   contentTab.addEventListener('click', () => {
-    // 激活内容替换标签页
-    contentTab.classList.remove('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    contentTab.classList.add('bg-blue-600', 'text-white', 'shadow-md');
-    
-    // 取消激活其他标签页
-    urlTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-    urlTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    notepadTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-    notepadTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    youtubeTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-    youtubeTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    
-    // 显示对应内容
-    contentReplaceContent.classList.remove('hidden');
-    urlContent.classList.add('hidden');
-    notepadContent.classList.add('hidden');
-    calculatorContent.classList.add('hidden');
-    youtubeContent.classList.add('hidden');
+    switchTab(contentTab, contentReplaceContent);
   });
 
   notepadTab.addEventListener('click', () => {
-    // 激活记事本标签页
-    notepadTab.classList.remove('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    notepadTab.classList.add('bg-blue-600', 'text-white', 'shadow-md');
-    
-    // 取消激活其他标签页
-    urlTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-    urlTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    contentTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-    contentTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    youtubeTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-    youtubeTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    
-    // 显示对应内容
-    notepadContent.classList.remove('hidden');
-    urlContent.classList.add('hidden');
-    contentReplaceContent.classList.add('hidden');
-    calculatorContent.classList.add('hidden');
-    youtubeContent.classList.add('hidden');
-    
+    switchTab(notepadTab, notepadContent);
     // 加载记事列表
     loadNotes();
   });
 
   calculatorTab.addEventListener('click', () => {
-    // 激活计算器标签页
-    calculatorTab.classList.remove('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    calculatorTab.classList.add('bg-blue-600', 'text-white', 'shadow-md');
-    
-    // 取消激活其他标签页
-    urlTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-    urlTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    contentTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-    contentTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    notepadTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-    notepadTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    youtubeTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-    youtubeTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    
-    // 显示对应内容
-    calculatorContent.classList.remove('hidden');
-    urlContent.classList.add('hidden');
-    contentReplaceContent.classList.add('hidden');
-    notepadContent.classList.add('hidden');
-    youtubeContent.classList.add('hidden');
+    switchTab(calculatorTab, calculatorContent);
   });
 
   youtubeTab.addEventListener('click', () => {
     console.log('[YouTube] 点击YouTube标签页');
-    
-    // 激活YouTube标签页
-    youtubeTab.classList.remove('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    youtubeTab.classList.add('bg-blue-600', 'text-white', 'shadow-md');
-    
-    // 取消激活其他标签页
-    urlTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-    urlTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    contentTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-    contentTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    notepadTab.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-    notepadTab.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-    
-    // 显示对应内容
-    youtubeContent.classList.remove('hidden');
-    urlContent.classList.add('hidden');
-    contentReplaceContent.classList.add('hidden');
-    notepadContent.classList.add('hidden');
-    calculatorContent.classList.add('hidden');
+    switchTab(youtubeTab, youtubeContent);
     
     // 清理过期缓存
+    clearExpiredCache();
     clearExpiredCache();
     
     // 显示欢迎信息，不进行默认搜索
