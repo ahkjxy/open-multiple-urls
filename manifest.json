@@ -36,6 +36,7 @@
     "service_worker": "background.js",
     "type": "module"
   },
+
   "options_page": "options.html",
   "author": "ahkjxy",
   "homepage_url": "https://github.com/ahkjxy/open-multiple-urls",

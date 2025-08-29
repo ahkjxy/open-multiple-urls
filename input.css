@@ -3,6 +3,14 @@
 @tailwind utilities;
 
 /* 自定义样式 */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 自定义样式 */
 @layer components {
   .btn-primary {
     @apply flex-1 py-2.5 px-4 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-lg hover:from-pink-600 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition-all shadow-sm hover:shadow-md;

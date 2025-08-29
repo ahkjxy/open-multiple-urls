@@ -10,7 +10,7 @@ const urlProcessor = new URLProcessor();
 const cacheManager = new CacheManager();
 const securityChecker = new SecurityChecker();
 
-// 监听来自 popup 的消息
+// 监听来自 popup 和 content script 的消息
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   switch (request.type) {
     case 'PROCESS_URLS':
@@ -28,6 +28,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     case 'SCHEDULE_URLS':
       handleScheduleUrls(request.data);
       break;
+    
     default:
       console.warn('Unknown message type:', request.type);
   }
@@ -101,6 +102,8 @@ async function handleGetCachedData(data) {
     sendResponse({ success: false, error: error.message });
   }
 }
+
+
 
 // 处理 URL 定时打开请求
 async function handleScheduleUrls(data) {

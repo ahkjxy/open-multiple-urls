@@ -7,166 +7,191 @@
   <link href="./dist/output.css" rel="stylesheet">
   <script src="theme-init.js"></script>
 </head>
-<body class="w-[500px] p-5 bg-gray-100 dark:bg-gray-800 transition-colors duration-200">
-  <div class="space-y-4">
+<body class="w-[500px] min-h-[600px] p-5 bg-gray-100 dark:bg-gray-800 transition-colors duration-200">
+  <div class="space-y-3">
     <!-- 标题栏 -->
     <div class="flex justify-between items-center">
-      <h1 class="text-xl font-bold text-blue-600 dark:text-blue-400" data-i18n="title">批量打开URL</h1>
-      <div class="flex items-center space-x-3">
-        <select id="languageSelect" class="rounded-lg border border-slate-200 dark:border-slate-700 py-1.5 px-3 text-sm text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500">
+      <h1 class="text-lg font-bold text-blue-600 dark:text-blue-400" data-i18n="title">批量打开URL</h1>
+      <div class="flex items-center space-x-2">
+        <select id="languageSelect" class="rounded-lg border border-slate-200 dark:border-slate-700 py-1 px-2 text-sm text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500">
           <option value="zh" data-i18n="languageZh">中文</option>
           <option value="en" data-i18n="languageEn">English</option>
         </select>
-        <button id="themeToggle" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400">
-          <svg id="sunIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button id="themeToggle" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400">
+          <svg id="sunIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
           </svg>
-          <svg id="moonIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg id="moonIcon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
           </svg>
         </button>
       </div>
     </div>
-    
-    <!-- URL输入区域 -->
-    <div class="space-y-3 bg-white dark:bg-slate-800 rounded-lg p-4 shadow-md border border-slate-200 dark:border-slate-700">
-      <div class="flex justify-between items-center">
-        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300" data-i18n="urlInputLabel">输入URL列表（每行一个）</label>
-        <div class="flex space-x-3">
-          <button id="importUrls" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium" data-i18n="import">导入</button>
-          <button id="exportUrls" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium" data-i18n="export">导出</button>
+
+    <!-- 标签页导航 -->
+    <div class="flex space-x-1 bg-slate-200 dark:bg-slate-600 rounded-lg p-1 shadow-inner">
+      <button id="urlTab" class="flex-1 py-2 px-2 text-sm font-semibold rounded-md bg-blue-600 text-white shadow-md transform transition-all duration-200 hover:bg-blue-700 hover:scale-105 active:scale-95" data-i18n="urlTab">URL管理</button>
+      <button id="contentTab" class="flex-1 py-2 px-2 text-sm font-semibold rounded-md bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-200 hover:scale-105 active:scale-95" data-i18n="contentTab">内容替换</button>
+      <button id="notepadTab" class="flex-1 py-2 px-2 text-sm font-semibold rounded-md bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-200 hover:scale-105 active:scale-95" data-i18n="notepadTab">记事本</button>
+      <button id="youtubeTab" class="flex-1 py-2 px-2 text-sm font-semibold rounded-md bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-200 hover:scale-105 active:scale-95" data-i18n="youtubeTab">YouTube</button>
+    </div>
+
+    <!-- URL管理标签页 -->
+    <div id="urlContent" class="space-y-3">
+      <!-- URL输入区域 -->
+      <div class="space-y-2 bg-white dark:bg-slate-800 rounded-lg p-3 shadow-md border border-slate-200 dark:border-slate-700">
+        <div class="flex justify-between items-center">
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300" data-i18n="urlInputLabel">输入URL列表（每行一个）</label>
+          <div class="flex space-x-2">
+            <button id="importUrls" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium" data-i18n="import">导入</button>
+            <button id="exportUrls" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium" data-i18n="export">导出</button>
+          </div>
+        </div>
+        <textarea
+          id="urlInput"
+          class="w-full h-32 p-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500"
+          data-i18n-placeholder="urlInputPlaceholder"></textarea>
+        <div class="flex justify-between text-xs">
+          <span id="urlCount" class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded text-slate-600 dark:text-slate-400" data-i18n="urlCount" data-i18n-params='{"count": 0}'>0 个URL</span>
+          <span id="validUrlCount" class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded text-slate-600 dark:text-slate-400" data-i18n="validUrlCount" data-i18n-params='{"count": 0}'>0 个有效URL</span>
         </div>
       </div>
-      <textarea
-        id="urlInput"
-        class="w-full h-40 p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500"
-        data-i18n-placeholder="urlInputPlaceholder"></textarea>
-      <div class="flex justify-between text-xs">
-        <span id="urlCount" class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded text-slate-600 dark:text-slate-400" data-i18n="urlCount" data-i18n-params='{"count": 0}'>0 个URL</span>
-        <span id="validUrlCount" class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded text-slate-600 dark:text-slate-400" data-i18n="validUrlCount" data-i18n-params='{"count": 0}'>0 个有效URL</span>
+
+      <!-- 操作按钮 -->
+      <div class="flex space-x-3">
+        <button
+          id="openUrls"
+          class="flex-1 py-2.5 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 shadow-md font-medium dark:bg-indigo-500 dark:hover:bg-indigo-600 dark:ring-offset-gray-800"
+          data-i18n="openUrls">
+          打开URL
+        </button>
+        <button
+          id="extractUrls"
+          class="flex-1 py-2.5 px-4 bg-gray-700 text-white rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 shadow-md font-medium dark:bg-gray-600 dark:hover:bg-gray-700 dark:ring-offset-gray-800"
+          data-i18n="extractUrls">
+          提取URL
+        </button>
       </div>
     </div>
 
-    <!-- 操作按钮 -->
-    <div class="flex space-x-3">
-      <button
-        id="openUrls"
-        class="flex-1 py-2.5 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 shadow-md font-medium dark:bg-indigo-500 dark:hover:bg-indigo-600 dark:ring-offset-gray-800"
-        data-i18n="openUrls">
-        打开URL
-      </button>
-      <button
-        id="extractUrls"
-        class="flex-1 py-2.5 px-4 bg-gray-700 text-white rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 shadow-md font-medium dark:bg-gray-600 dark:hover:bg-gray-700 dark:ring-offset-gray-800"
-        data-i18n="extractUrls">
-        提取URL
-      </button>
-    </div>
-
-    <!-- 选项设置 -->
-    <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-md border border-gray-200 dark:border-gray-600">
-      <div class="grid grid-cols-2 gap-4 mb-6">
-        <div class="flex items-center space-x-2">
-          <input type="checkbox" id="delayLoad" class="rounded text-blue-600 border-slate-300 dark:border-slate-600 focus:ring-blue-500/50">
-          <label for="delayLoad" class="text-sm text-slate-700 dark:text-slate-300" data-i18n="delayLoad">延迟加载</label>
-        </div>
-
-        <div class="flex items-center space-x-2">
-          <input type="checkbox" id="preserveInput" class="rounded text-blue-600 border-slate-300 dark:border-slate-600 focus:ring-blue-500/50">
-          <label for="preserveInput" class="text-sm text-slate-700 dark:text-slate-300" data-i18n="preserveInput">保留输入</label>
-        </div>
-
-        <div class="flex items-center space-x-2">
-          <input type="checkbox" id="removeDuplicates" class="rounded text-blue-600 border-slate-300 dark:border-slate-600 focus:ring-blue-500/50">
-          <label for="removeDuplicates" class="text-sm text-slate-700 dark:text-slate-300" data-i18n="removeDuplicates">去重</label>
-        </div>
-
-        <div class="flex items-center space-x-2">
-          <input type="checkbox" id="searchNonUrls" class="rounded text-blue-600 border-slate-300 dark:border-slate-600 focus:ring-blue-500/50">
-          <label for="searchNonUrls" class="text-sm text-slate-700 dark:text-slate-300" data-i18n="searchNonUrls">搜索非URL</label>
-        </div>
-
-        <div class="flex items-center space-x-2">
-          <input type="checkbox" id="validateUrls" class="rounded text-blue-600 border-slate-300 dark:border-slate-600 focus:ring-blue-500/50">
-          <label for="validateUrls" class="text-sm text-slate-700 dark:text-slate-300" data-i18n="validateUrls">验证URL</label>
-        </div>
-
-        <div class="flex items-center space-x-2">
-          <input type="checkbox" id="autoProtocol" class="rounded text-blue-600 border-slate-300 dark:border-slate-600 focus:ring-blue-500/50">
-          <label for="autoProtocol" class="text-sm text-slate-700 dark:text-slate-300" data-i18n="autoProtocol">自动https</label>
-        </div>
-      </div>
-
-      <div class="space-y-4">
-        <div class="flex items-center justify-between">
-          <label class="text-sm font-medium text-slate-700 dark:text-slate-300" data-i18n="openOrder">打开顺序</label>
-          <select id="openOrder" class="w-40 rounded-lg border border-slate-200 dark:border-slate-700 py-1.5 px-3 text-sm text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500">
-            <option value="normal" data-i18n="openOrderNormal">正常顺序</option>
-            <option value="reverse" data-i18n="openOrderReverse">反向顺序</option>
-            <option value="random" data-i18n="openOrderRandom">随机顺序</option>
-            <option value="domain" data-i18n="openOrderDomain">按域名排序</option>
-            <option value="time" data-i18n="openOrderTime">按时间排序</option>
-          </select>
-        </div>
-        <div class="flex items-center justify-between">
-          <label class="text-sm font-medium text-slate-700 dark:text-slate-300" data-i18n="groupOption">标签页分组</label>
-          <select id="groupOption" class="w-40 rounded-lg border border-slate-200 dark:border-slate-700 py-1.5 px-3 text-sm text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500">
-            <option value="none" data-i18n="groupOptionNone">不分组</option>
-            <option value="new" data-i18n="groupOptionNew">新建分组</option>
-            <option value="existing" data-i18n="groupOptionExisting">添加到现有分组</option>
-          </select>
-        </div>
-        <div class="flex items-center justify-between">
-          <label class="text-sm font-medium text-slate-700 dark:text-slate-300" data-i18n="urlCategory">URL分类</label>
-          <select id="urlCategory" class="w-40 rounded-lg border border-slate-200 dark:border-slate-700 py-1.5 px-3 text-sm text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500">
-            <option value="none" data-i18n="urlCategoryNone">不分类</option>
-            <option value="domain" data-i18n="urlCategoryDomain">按域名分类</option>
-            <option value="custom" data-i18n="urlCategoryCustom">自定义分类</option>
-          </select>
-        </div>
-        <div class="flex items-center justify-between">
-          <label class="text-sm font-medium text-slate-700 dark:text-slate-300" data-i18n="maxUrls">最大URL数量</label>
-          <input type="number" id="maxUrls" min="1" max="100" value="20" class="w-20 rounded-lg border border-slate-200 dark:border-slate-700 py-1.5 px-3 text-sm text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500">
-        </div>
-      </div>
-    </div>
-
-    <!-- 进度条 -->
-    <div id="progressContainer" class="hidden">
-      <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2.5 overflow-hidden">
-        <div id="progressBar" class="bg-indigo-600 dark:bg-indigo-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
-      </div>
-      <div class="text-sm text-gray-600 dark:text-gray-300 text-center mt-2">
-        <span id="progressText" data-i18n="processing">处理中...</span>
-      </div>
-    </div>
-
-    <!-- 状态信息弹窗 -->
-    <div id="statusModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center">
-      <div class="bg-white dark:bg-gray-700 rounded-lg p-6 shadow-xl border border-gray-200 dark:border-gray-600 max-w-sm w-full mx-4 text-center">
-        <div id="status" class="text-lg font-medium text-slate-700 dark:text-slate-300" data-i18n="status"></div>
-        <button id="closeStatus" class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm transition-all duration-200 shadow-md font-medium dark:bg-indigo-500 dark:hover:bg-indigo-600">确定</button>
-      </div>
-    </div>
-
-    <!-- 状态提示容器 -->
-    <div id="statusContainer" class="fixed bottom-4 right-4 z-50"></div>
-
-    <!-- URL预览模态框 -->
-    <div id="urlPreviewModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center">
-      <div class="bg-white dark:bg-gray-700 rounded-lg p-6 max-w-lg w-full mx-4 shadow-xl border border-gray-200 dark:border-gray-600">
+    <!-- 内容替换标签页 -->
+    <div id="contentReplaceContent" class="space-y-3 hidden">
+      <div class="bg-white dark:bg-slate-800 rounded-lg p-4 shadow-md border border-slate-200 dark:border-slate-700">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold text-slate-700 dark:text-slate-300" data-i18n="urlPreview">URL预览</h3>
-          <button id="closePreview" class="p-1.5 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+          <h3 class="text-lg font-semibold text-slate-700 dark:text-slate-300" data-i18n="contentReplaceLabel">内容替换</h3>
+        </div>
+        
+        <!-- 原内容 -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300" data-i18n="originalContent">原内容</label>
+          <textarea id="originalContent" class="w-full h-24 p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500" data-i18n-placeholder="originalContentPlaceholder"></textarea>
+        </div>
+
+        <!-- 查找和替换 -->
+        <div class="grid grid-cols-1 gap-3 mt-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" data-i18n="findText">查找内容</label>
+            <input type="text" id="findText" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500" data-i18n-placeholder="findTextPlaceholder">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" data-i18n="replaceWith">替换为</label>
+            <input type="text" id="replaceWith" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500" data-i18n-placeholder="replaceWithPlaceholder">
+          </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="grid grid-cols-2 gap-3 mt-4">
+          <button id="replaceBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50" data-i18n="replace">替换</button>
+          <button id="replaceAllBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500/50" data-i18n="replaceAll">全部替换</button>
+          <button id="copyBtn" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50" data-i18n="copyContent">复制</button>
+          <button id="clearBtn" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm font-medium transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500/50" data-i18n="clear">清空</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 记事本标签页 -->
+    <div id="notepadContent" class="space-y-4 hidden">
+      <!-- 记事本工具栏 -->
+      <div class="flex justify-between items-center">
+        <button id="newNote" class="px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium transition-all duration-200 shadow-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50" data-i18n="newNote">+ 新建记事</button>
+        <div class="relative">
+          <input type="text" id="searchNotes" class="pl-8 pr-3 py-2 border border-gray-200 rounded-lg bg-white text-sm text-gray-700 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 w-48 shadow-sm" placeholder="搜索记事..." data-i18n-placeholder="searchNotesPlaceholder">
+          <svg class="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- 记事列表 -->
+      <div id="noteList" class="space-y-3 max-h-[450px] overflow-y-auto">
+        <!-- 记事列表项将通过JavaScript动态生成 -->
+      </div>
+    </div>
+
+    <!-- 记事编辑弹窗 -->
+    <div id="noteEditModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50">
+      <div class="bg-white rounded-xl p-6 shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-semibold text-gray-900" data-i18n="editNoteTitle">编辑记事</h3>
+          <button id="closeNoteEdit" class="p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
           </button>
         </div>
-        <div id="urlPreviewList" class="max-h-96 overflow-y-auto space-y-2 pr-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700"></div>
-        <div class="mt-6 flex justify-end space-x-3">
-          <button id="confirmOpen" class="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm transition-all duration-200 shadow-md font-medium dark:bg-indigo-500 dark:hover:bg-indigo-600 dark:ring-offset-gray-800" data-i18n="confirmOpen">确认打开</button>
+        
+        <div class="space-y-6">
+          <div>
+            <input type="text" id="modalNoteTitle" class="w-full p-3 border-0 border-b-2 border-gray-200 bg-transparent text-lg font-medium text-gray-900 focus:ring-0 focus:border-blue-500 transition-colors" placeholder="输入记事标题..." data-i18n-placeholder="noteTitlePlaceholder">
+          </div>
+          <div>
+            <textarea id="modalNoteContent" class="w-full h-64 p-3 border-0 bg-transparent text-sm text-gray-700 focus:ring-0 resize-none" placeholder="输入记事内容..." data-i18n-placeholder="noteContentPlaceholder"></textarea>
+          </div>
+          <div class="flex justify-between text-xs text-gray-400 pt-4 border-t border-gray-100">
+            <span id="modalNoteCreatedDate" data-i18n="createdDate" data-i18n-params='{"date": ""}'>创建时间：</span>
+            <span id="modalNoteModifiedDate" data-i18n="modifiedDate" data-i18n-params='{"date": ""}'>修改时间：</span>
+          </div>
         </div>
+        
+        <div class="flex justify-end space-x-3 mt-8 pt-4 border-t border-gray-100">
+          <button id="cancelNoteEdit" class="px-6 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors" data-i18n="cancel">取消</button>
+          <button id="saveNoteEdit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/50" data-i18n="saveNote">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- YouTube标签页 -->
+    <div id="youtubeContent" class="space-y-4 hidden">
+      <!-- API密钥配置区域 -->
+      <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
+        <p class="text-xs text-yellow-700 dark:text-yellow-300 mt-1 mb-2">已提供默认API密钥，您也可以使用自己的密钥</p>
+        <div class="flex items-center justify-between">
+          <div class="flex-1">
+            <input type="password" id="youtubeApiKeyInput" class="w-full px-2 py-1 text-xs border border-yellow-300 dark:border-yellow-700 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-1 focus:ring-yellow-500" placeholder="输入API密钥（可选）" value="AIzaSyB3XLmosF8neF8QgX9AXCM6mmb3VSO_Pc4">
+          </div>
+          <button id="saveApiKeyBtn" class="ml-2 px-3 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 transition-colors flex items-center justify-center min-w-[60px] h-[28px] leading-none">保存</button>
+        </div>
+      </div>
+
+      <!-- 搜索区域 -->
+      <div class="bg-white dark:bg-slate-800 rounded-full p-2 shadow-md border border-slate-200 dark:border-slate-700">
+        <div class="flex items-center space-x-2">
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input type="text" id="youtubeSearch" class="flex-1 px-3 py-2 bg-transparent text-sm text-slate-900 dark:text-slate-100 focus:outline-none" placeholder="搜索YouTube视频...">
+          <button id="youtubeSearchBtn" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all duration-200 font-medium">搜索</button>
+        </div>
+      </div>
+
+      <!-- 搜索结果 -->
+      <div id="youtubeResults" class="grid grid-cols-1 gap-4">
+        <!-- 视频卡片将在这里动态生成 -->
+      </div>
+
+      <!-- 加载更多按钮 -->
+      <div id="youtubeLoadMore" class="hidden text-center">
+        <button id="loadMoreBtn" class="px-6 py-3 bg-slate-600 text-white rounded-full hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500/50 transition-all duration-200 font-medium">加载更多</button>
       </div>
     </div>
   </div>

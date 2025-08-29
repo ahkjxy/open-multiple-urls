@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         themeSelect: document.getElementById('themeSelect'),
         showUrlCount: document.getElementById('showUrlCount'),
         showProgressBar: document.getElementById('showProgressBar'),
+
         defaultMaxUrls: document.getElementById('defaultMaxUrls'),
         defaultValidateUrls: document.getElementById('defaultValidateUrls'),
         defaultAutoProtocol: document.getElementById('defaultAutoProtocol'),
@@ -30,6 +31,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         theme: 'system',
         showUrlCount: true,
         showProgressBar: true,
+
         defaultMaxUrls: 20,
         defaultValidateUrls: true,
         defaultAutoProtocol: true,
@@ -109,6 +111,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             elements.defaultAutoProtocol.checked = settings.defaultAutoProtocol;
             elements.cacheExpiration.value = settings.cacheExpiration;
             elements.enableDebugMode.checked = settings.enableDebugMode;
+    
 
             // 应用主题
             applyTheme(settings.theme);
@@ -136,7 +139,8 @@ document.addEventListener('DOMContentLoaded', async function() {
                 defaultValidateUrls: elements.defaultValidateUrls.checked,
                 defaultAutoProtocol: elements.defaultAutoProtocol.checked,
                 cacheExpiration: parseInt(elements.cacheExpiration.value),
-                enableDebugMode: elements.enableDebugMode.checked
+                enableDebugMode: elements.enableDebugMode.checked,
+
             };
 
             await chrome.storage.local.set({ settings });
