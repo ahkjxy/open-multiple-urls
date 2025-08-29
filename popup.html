@@ -112,50 +112,49 @@
     <!-- 记事本标签页 -->
     <div id="notepadContent" class="space-y-4 hidden">
       <!-- 记事本工具栏 -->
-      <div class="flex justify-between items-center">
-        <button id="newNote" class="px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium transition-all duration-200 shadow-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50" data-i18n="newNote">+ 新建记事</button>
-        <div class="relative">
-          <input type="text" id="searchNotes" class="pl-8 pr-3 py-2 border border-gray-200 rounded-lg bg-white text-sm text-gray-700 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 w-48 shadow-sm" placeholder="搜索记事..." data-i18n-placeholder="searchNotesPlaceholder">
-          <svg class="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-          </svg>
+      <div class="flex justify-between items-center mb-4">
+        <button id="newNote" class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50" data-i18n="newNote">+ 新建记事</button>
+        <div>
+          <input type="text" id="searchNotes" class="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm text-gray-700 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 w-48" placeholder="搜索记事..." data-i18n-placeholder="searchNotesPlaceholder">
         </div>
       </div>
 
       <!-- 记事列表 -->
-      <div id="noteList" class="space-y-3 max-h-[450px] overflow-y-auto">
-        <!-- 记事列表项将通过JavaScript动态生成 -->
+      <div class="bg-white rounded-lg border border-gray-200">
+        <div id="noteList" class="max-h-[450px] overflow-y-auto">
+          <!-- 记事列表项将通过JavaScript动态生成 -->
+        </div>
       </div>
     </div>
 
     <!-- 记事编辑弹窗 -->
-    <div id="noteEditModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50">
-      <div class="bg-white rounded-xl p-6 shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-semibold text-gray-900" data-i18n="editNoteTitle">编辑记事</h3>
-          <button id="closeNoteEdit" class="p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+    <div id="noteEditModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-gray-900" data-i18n="editNoteTitle">编辑记事</h3>
+          <button id="closeNoteEdit" class="p-1.5 rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
           </button>
         </div>
         
-        <div class="space-y-6">
+        <div class="space-y-4">
           <div>
-            <input type="text" id="modalNoteTitle" class="w-full p-3 border-0 border-b-2 border-gray-200 bg-transparent text-lg font-medium text-gray-900 focus:ring-0 focus:border-blue-500 transition-colors" placeholder="输入记事标题..." data-i18n-placeholder="noteTitlePlaceholder">
+            <input type="text" id="modalNoteTitle" class="w-full p-2 border border-gray-300 rounded-lg bg-white text-sm text-gray-900 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500" placeholder="输入记事标题..." data-i18n-placeholder="noteTitlePlaceholder">
           </div>
           <div>
-            <textarea id="modalNoteContent" class="w-full h-64 p-3 border-0 bg-transparent text-sm text-gray-700 focus:ring-0 resize-none" placeholder="输入记事内容..." data-i18n-placeholder="noteContentPlaceholder"></textarea>
+            <textarea id="modalNoteContent" class="w-full h-64 p-3 border border-gray-300 rounded-lg bg-white text-sm text-gray-700 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 resize-none" placeholder="输入记事内容..." data-i18n-placeholder="noteContentPlaceholder"></textarea>
           </div>
-          <div class="flex justify-between text-xs text-gray-400 pt-4 border-t border-gray-100">
+          <div class="flex justify-between text-xs text-gray-500 pt-2 border-t border-gray-200">
             <span id="modalNoteCreatedDate" data-i18n="createdDate" data-i18n-params='{"date": ""}'>创建时间：</span>
             <span id="modalNoteModifiedDate" data-i18n="modifiedDate" data-i18n-params='{"date": ""}'>修改时间：</span>
           </div>
         </div>
         
-        <div class="flex justify-end space-x-3 mt-8 pt-4 border-t border-gray-100">
-          <button id="cancelNoteEdit" class="px-6 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors" data-i18n="cancel">取消</button>
-          <button id="saveNoteEdit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/50" data-i18n="saveNote">保存</button>
+        <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
+          <button id="cancelNoteEdit" class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors" data-i18n="cancel">取消</button>
+          <button id="saveNoteEdit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/50" data-i18n="saveNote">保存</button>
         </div>
       </div>
     </div>
